@@ -162,7 +162,7 @@ List_Error_t List_Filter(List_t*, List_Find_Fnc);
  *  @param List_t* The list to remove the given index from.
  *  @return void* The data held within the removed node or NULL on error.
  */
-void* List_Remove(size_t, List_t*);
+void* List_Remove_At(size_t, List_t*);
 /*
  *  @brief Remove the last node from the list.
  *  @param List_t* The list to remove the last node from.
@@ -181,7 +181,7 @@ void* List_Shift(List_t*);
  *  @param List_t* The list to delete the given index from.
  *  @return void.
  */
-void List_Delete(size_t, List_t*);
+void List_Delete_At(size_t, List_t*);
 
 /*
  *  @brief Sort a given list using the set comparison function.

@@ -33,7 +33,7 @@ List_t;
  *  @param void* The data to hold within the node.
  *  @return List_Node* A pointer to the allocated node or NULL on error.
  */
-static List_Node* List_Create_Node(void* data_p)
+static List_Node* List_Node_Create(void* data_p)
 {
 	if (NULL == data_p)
 	{
@@ -88,7 +88,7 @@ static List_Node* List_Node_At(size_t at, List_t* list_p)
  *  @param List_t* A pointer to the list that the node should belong in.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-static List_Error_t List_Insert_Node(List_Node* node_p, size_t at, List_t* list_p)
+static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_p)
 {
 	//param check
 	if (NULL == node_p || NULL == list_p || at > list_p->length)
@@ -149,7 +149,7 @@ static List_Error_t List_Insert_Node(List_Node* node_p, size_t at, List_t* list_
  *  @param List_Node* A pointer to the node to destroy.
  *  @return Void
  */
-static void List_Destroy_Node(List_Node* node)
+static void List_Node_Destroy(List_Node* node)
 {
 	//check params
 	if (NULL != node)
@@ -165,7 +165,7 @@ static void List_Destroy_Node(List_Node* node)
  *  @param List_t* A pointer to the list that contains the node in question.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-static List_Error_t List_Remove_Node(List_Node* node, List_t* list_p)
+static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p)
 {
 	//check params
 	if (NULL == list_p || NULL == node)
@@ -190,7 +190,7 @@ static List_Error_t List_Remove_Node(List_Node* node, List_t* list_p)
 	{
 		list_p->head_p = after_node;
 	}
-	List_Destroy_Node(node);
+	List_Node_Destroy(node);
 	return LIST_ERROR_SUCCESS;
 }
 
@@ -255,13 +255,13 @@ List_Error_t List_Push(void* data_p, List_t* list_p)
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//try to allocate the node
-	List_Node* new_node_p = List_Create_Node(data_p);
+	List_Node* new_node_p = List_Node_Create(data_p);
 	//make sure it was allocated properly
 	if (NULL == new_node_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	return List_Insert_Node(new_node_p, list_p->length, list_p);
+	return List_Node_Insert(new_node_p, list_p->length, list_p);
 }
 
 /*
@@ -278,13 +278,13 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p)
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//try to allocate the node
-	List_Node* new_node_p = List_Create_Node(data_p);
+	List_Node* new_node_p = List_Node_Create(data_p);
 	//make sure it was allocated properly
 	if (NULL == new_node_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	return List_Insert_Node(new_node_p, 0, list_p);
+	return List_Node_Insert(new_node_p, 0, list_p);
 }
 
 /*
@@ -302,14 +302,14 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//try to allocate the node
-	List_Node* new_node_p = List_Create_Node(data_p);
+	List_Node* new_node_p = List_Node_Create(data_p);
 	//make sure it was allocated properly
 	if (NULL == new_node_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//at is checked in insert node
-	return List_Insert_Node(new_node_p, at, list_p);
+	return List_Node_Insert(new_node_p, at, list_p);
 }
 
 /*
@@ -480,7 +480,7 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
  *  @param List_t* The list to remove the given index from.
  *  @return void* The data held within the removed node or NULL on error.
  */
-void* List_Remove(size_t at, List_t* list_p)
+void* List_Remove_At(size_t at, List_t* list_p)
 {
 	//check params
 	if (NULL == list_p || at > list_p->length)
@@ -496,7 +496,7 @@ void* List_Remove(size_t at, List_t* list_p)
 	//save the nodes data
 	void* node_data = node->data_p;
 	//remove the node
-	List_Error_t removed_node = List_Remove_Node(node, list_p);
+	List_Error_t removed_node = List_Node_Remove(node, list_p);
 	if (LIST_ERROR_SUCCESS != removed_node)
 	{
 		return NULL;
@@ -511,7 +511,7 @@ void* List_Remove(size_t at, List_t* list_p)
  *  @param List_t* The list to delete the given index from.
  *  @return void.
  */
-void List_Delete(size_t at, List_t* list_p)
+void List_Delete_At(size_t at, List_t* list_p)
 {
 	//check params
 	if (NULL == list_p || at > list_p->length)
@@ -519,7 +519,7 @@ void List_Delete(size_t at, List_t* list_p)
 		return;
 	}
 	//find the node and delete it
-	void* removing_node_data = List_Remove(at, list_p);
+	void* removing_node_data = List_Remove_At(at, list_p);
 	if (NULL != removing_node_data)
 	{
 		//we should be on the correct node data, free it
@@ -543,7 +543,7 @@ void* List_Pop(List_t* list_p)
 		return NULL;
 	}
 	//get the head node, an empty list will give NULL
-	void* removing_node_data = List_Remove(list_p->length-1, list_p);
+	void* removing_node_data = List_Remove_At(list_p->length-1, list_p);
 	if (NULL == removing_node_data)
 	{
 		return NULL;
@@ -565,7 +565,7 @@ void* List_Shift(List_t* list_p)
 		return NULL;
 	}
 	//get the head node, an empty list will give NULL
-	void* removing_node_data = List_Remove(0, list_p);
+	void* removing_node_data = List_Remove_At(0, list_p);
 	if (NULL == removing_node_data)
 	{
 		return NULL;
@@ -609,7 +609,7 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 				{
 					list_p->free(current_node->data_p);
 				}
-				List_Remove_Node(current_node, list_p);
+				List_Node_Remove(current_node, list_p);
 			}
 			//get next node
 			current_node = next_node;
@@ -640,7 +640,7 @@ void List_Purge(List_t* list_p)
 	List_Node* shifted_head = List_Shift(list_p);
 	while (NULL != shifted_head)
 	{
-		List_Destroy_Node(shifted_head);
+		List_Node_Destroy(shifted_head);
 		//get the next node
 		shifted_head = List_Shift(list_p);
 	}
