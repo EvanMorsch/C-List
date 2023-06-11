@@ -688,39 +688,6 @@ size_t List_Length(List_t* list_p)
  */
 List_Error_t List_Sort(List_t* list_p)
 {
-	//check params
-	if (NULL == list_p)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-	//create a heap for sorting
-	Heap_t* sorting_heap = Heap_Create(list_p->cmp, list_p->free);
-	if (NULL == sorting_heap)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-	
-	//remove all list members into heap
-	List_Node* shifted_head = List_Shift(list_p);
-	while (NULL != shifted_head)
-	{
-		Heap_Insert(shifted_head, sorting_heap);
-		//i dont want to stop if an error occurs
-			
-		shifted_head = List_Shift(list_p);
-	}
-	
-	//now remove all heap members into list
-	void* popped_data = Heap_Pop(sorting_heap);
-	while (NULL != popped_data)
-	{
-		List_Push(popped_data, list_p);
-		//i dont want to stop if an error occurs
-		
-		popped_data = Heap_Pop(sorting_heap);
-	}
-	
-	Heap_Destroy(sorting_heap);
-	
-	return LIST_ERROR_SUCCESS;
+	(void)list_p;
+	return LIST_ERROR_FAILURE;
 }

@@ -5,7 +5,6 @@
 #ifndef list_h
 #define list_h
 
-#include "heap.h"//for sorting algorithm
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -15,6 +14,7 @@
  */
 typedef enum List_Error_t {
 	LIST_ERROR_SUCCESS,
+	LIST_ERROR_FAILURE,
 	LIST_ERROR_INVALID_PARAM,
 	LIST_ERROR_EXCEED_LIMIT,
 	LIST_ERROR_BAD_ENTRY
