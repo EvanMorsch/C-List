@@ -575,6 +575,37 @@ void* List_Shift(List_t* list_p)
 }
 
 /*
+ *  @brief Remove the first node from the list.
+ *  @param List_t* The list to reduce.
+ *  @param list_reduce_fnc The function used to reduce each node.
+ *  @param int The value to begin reduction with.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulator)
+{
+	//check params
+	if (NULL == list_p || NULL == reducer || NULL == accumulator)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	for (size_t i = 0; i < list_p->length; i++)
+	{
+		//make sure the node is valid
+		//im not including contingency "else" on purpose
+		if (NULL != current_node)
+		{
+			*accumulator = reducer(current_node->data_p, *accumulator);
+			//next node
+			current_node = current_node->next_p;
+		}
+	}
+	return LIST_ERROR_SUCCESS;
+}
+
+/*
  *  @brief Test each node in a list using a given find function, removing each that fail the given find function.
  *	   Note that filtered entries will be destroyed.
  *  @param List_t* The list to filter entries from.
