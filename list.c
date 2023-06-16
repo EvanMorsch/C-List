@@ -407,10 +407,8 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 	{
 		return false;
 	}
-	//get the head node, an empty list will give NULL
-	List_Node* current_node = list_p->head_p;
 	//loop till the end
-	for (size_t i = 0; i < list_p->length; i++)
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -421,8 +419,6 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 			{
 				return true;
 			}
-			//otherwise, just try the next node
-			current_node = current_node->next_p;
 		}
 		else
 		{
@@ -448,10 +444,8 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 	{
 		return false;
 	}
-	//get the head node, an empty list will give NULL
-	List_Node* current_node = list_p->head_p;
 	//loop till the end
-	for (size_t i = 0; i < list_p->length; i++)
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
@@ -463,8 +457,6 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 			{
 				return false;
 			}
-			//otherwise, try the next node
-			current_node = current_node->next_p;
 		}
 	}
 	//we didnt find a failure!
@@ -484,16 +476,13 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 	{
 		return false;
 	}
-	//get the head node, an empty list will give NULL
-	List_Node* current_node = list_p->head_p;
 	//loop till the end
-	for (size_t i = 0; i < list_p->length; i++)
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
 		{
 			do_fnc(current_node->data_p);
-			current_node = current_node->next_p;
 		}
 		else
 		{
@@ -618,17 +607,13 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulat
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	
-	//get the head node, an empty list will give NULL
-	List_Node* current_node = list_p->head_p;
-	for (size_t i = 0; i < list_p->length; i++)
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
 		if (NULL != current_node)
 		{
 			*accumulator = reducer(current_node->data_p, *accumulator);
-			//next node
-			current_node = current_node->next_p;
 		}
 	}
 	return LIST_ERROR_SUCCESS;
