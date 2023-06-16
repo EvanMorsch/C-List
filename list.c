@@ -221,6 +221,35 @@ List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free)
 }
 
 /*
+ *  @brief Verify that the given list is valid.
+ *  @param List_t* The list to verify.
+ *  @param List_Find_Fnc A user provided function to cehck validity of list values.
+			If Null is passed, this will not be used and only metadata will be validated.
+ *  @return List_Error_t LIST_ERROR_SUCCESS if the list is valid or an error attempting to describe the failure.
+ */
+List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check)
+{
+	//check params
+	if (NULL == list_p)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	
+	//keep count of nodes to verify size
+	size_t actual_length = 0;
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	{
+		//user validity check
+		if (NULL != valid_check && !valid_check(current_node->data_p))
+		{
+			return LIST_ERROR_BAD_ENTRY;
+		}
+		actual_length++;
+	}
+	return actual_length == list_p->length ? LIST_ERROR_SUCCESS : LIST_ERROR_BAD_ENTRY;
+}
+
+/*
  *  @brief Get the data in the node at the given location.
  *  @param size_t The index of the node in question.
  *  @param List_t* The list that contains the node in question.

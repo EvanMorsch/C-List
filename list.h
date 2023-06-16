@@ -69,6 +69,16 @@ typedef struct List_t List_t;
  *  @return List_t* A pointer to the allocated list or NULL on error.
  */
 List_t* List_Create(size_t, List_Cmp_Fnc, List_Free_Fnc);
+
+/*
+ *  @brief Verify that the given list is valid.
+ *  @param List_t* The list to verify.
+ *  @param List_Find_Fnc A user provided function to cehck validity of list values.
+			If Null is passed, this will not be used and only metadata will be validated.
+ *  @return List_Error_t LIST_ERROR_SUCCESS if the list is valid or an error attempting to describe the failure.
+ */
+List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check);
+
 /*
  *  @brief Remove and destroy every node in the given list.
  *  @param List_t* The list to destroy nodes within.
