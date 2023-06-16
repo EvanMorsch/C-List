@@ -182,6 +182,16 @@ void* List_Pop(List_t*);
  *  @return void* The data held within the removed node or NULL on error.
  */
 void* List_Shift(List_t*);
+
+/*
+ *  @brief Remove the first node from the list.
+ *  @param List_t* The list to reduce.
+ *  @param list_reduce_fnc The function used to reduce each node.
+ *  @param int The value to begin reduction with.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulator);
+
 /*
  *  @brief Remove a given index from the list and destroy the data held within it.
  *  @param size_t The index to delete from the list.
