@@ -211,6 +211,13 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulat
 void List_Delete_At(size_t, List_t*);
 
 /*
+ *  @brief Reverse a given list from its current order.
+ *  @param List_t* The list to reverse.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reverse(List_t* list_p);
+
+/*
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
