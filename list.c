@@ -726,6 +726,29 @@ size_t List_Length(List_t* list_p)
 }
 
 /*
+ *  @brief Reverse a given list from its current order.
+ *  @param List_t* The list to reverse.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reverse(List_t* list_p)
+{
+	if (NULL == list_p)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	size_t midpoint = list_p->length / 2;
+	for(size_t i = 0; i < midpoint; i++)
+	{
+		List_Error_t could_swap = List_Node_Swap(
+			List_Node_At(i),
+			List_Node_At(list_p->length - i)
+		);
+		if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+	}
+	return LIST_ERROR_SUCCESS;
+}
+
+/*
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
