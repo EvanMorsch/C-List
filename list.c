@@ -159,6 +159,34 @@ static void List_Node_Destroy(List_Node* node)
 }
 
 /*
+ *  @brief Swap list indexes of two given nodes.
+ *  @param List_Node* A pointer to the first node to swap.
+ *  @param List_Node* A pointer to the second node to swap.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b)
+{
+	//check params
+	if (NULL == node_a || NULL == node_b)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+
+	//store tmp vals for swap
+	List_Node* tmp_next_p = node_a->next_p;
+	List_Node* tmp_previous_p = node_a->previous_p;
+
+	//change a's neighbors
+	node_a->next_p = node_b->next_p;
+	node_a->previous_p = node_b->previous_p;
+	//change b's neighbors
+	node_b->next_p = tmp_next_p;
+	node_b->previous_p = tmp_previous_p;
+
+	return LIST_ERROR_SUCCESS;
+}
+
+/*
  *  @brief Remove a given node from a given list.
  *     Note that this will free the node structure BUT WILL NOT free the data held within the node.
  *  @param List_Node* A pointer to the node to remove.
