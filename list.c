@@ -768,8 +768,8 @@ List_Error_t List_Reverse(List_t* list_p)
 	for(size_t i = 0; i < midpoint; i++)
 	{
 		List_Error_t could_swap = List_Node_Swap(
-			List_Node_At(i),
-			List_Node_At(list_p->length - i)
+			List_Node_At(i, list_p),
+			List_Node_At(list_p->length - i, list_p)
 		);
 		if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
 	}
