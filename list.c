@@ -280,6 +280,50 @@ List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free)
 }
 
 /*
+ *  @brief Copy that the given list is valid.
+ *  @param List_t* The list to copy.
+ *  @param List_Copy_Fnc A user provided function to copy node values.
+			If Null is passed, a shallow copy will be formed where:
+				Each node value is the same pointer
+				The list itself will be in different
+ *  @return List_t* A pointer to the allocated list or NULL on error.
+ */
+List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node_fnc)
+{
+	//check params
+	if (NULL == list_p)
+	{
+		return NULL;
+	}
+
+	List_t* copy_list = List_Create(list_p->max_length, list_p->cmp, list_p->free);
+	if (NULL == copy_list)
+	{
+		return NULL;
+	}
+	
+	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	{
+		List_Error_t could_push;
+		if (NULL == copy_node_fnc)
+		{
+			could_push = List_Push(current_node->data_p, list_p);
+		}
+		else
+		{
+			could_push = List_Push(copy_node_fnc(current_node->data_p), list_p);
+		}
+
+		if (LIST_ERROR_SUCCESS	!= could_push)
+		{
+			List_Destroy(copy_list);
+			return NULL;
+		}
+	}
+	return copy_list;
+}
+
+/*
  *  @brief Verify that the given list is valid.
  *  @param List_t* The list to verify.
  *  @param List_Find_Fnc A user provided function to cehck validity of list values.
