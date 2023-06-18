@@ -159,6 +159,34 @@ static void List_Node_Destroy(List_Node* node)
 }
 
 /*
+ *  @brief Swap list indexes of two given nodes.
+ *  @param List_Node* A pointer to the first node to swap.
+ *  @param List_Node* A pointer to the second node to swap.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b)
+{
+	//check params
+	if (NULL == node_a || NULL == node_b)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+
+	//store tmp vals for swap
+	List_Node* tmp_next_p = node_a->next_p;
+	List_Node* tmp_previous_p = node_a->previous_p;
+
+	//change a's neighbors
+	node_a->next_p = node_b->next_p;
+	node_a->previous_p = node_b->previous_p;
+	//change b's neighbors
+	node_b->next_p = tmp_next_p;
+	node_b->previous_p = tmp_previous_p;
+
+	return LIST_ERROR_SUCCESS;
+}
+
+/*
  *  @brief Remove a given node from a given list.
  *     Note that this will free the node structure BUT WILL NOT free the data held within the node.
  *  @param List_Node* A pointer to the node to remove.
@@ -723,6 +751,29 @@ size_t List_Length(List_t* list_p)
 		return list_p->length;
 	}
 	return 0;
+}
+
+/*
+ *  @brief Reverse a given list from its current order.
+ *  @param List_t* The list to reverse.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reverse(List_t* list_p)
+{
+	if (NULL == list_p)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	size_t midpoint = list_p->length / 2;
+	for(size_t i = 0; i < midpoint; i++)
+	{
+		List_Error_t could_swap = List_Node_Swap(
+			List_Node_At(i, list_p),
+			List_Node_At(list_p->length - i, list_p)
+		);
+		if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+	}
+	return LIST_ERROR_SUCCESS;
 }
 
 /*
