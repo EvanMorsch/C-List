@@ -28,7 +28,7 @@ List_Error_t;
  *  @return int  The result of a comparison. Positive numbers indicate precedence to the first member,
  *	   negative will indicate precedence to the second, 0 will indicate no precedence difference.
  */
-typedef int (*List_Cmp_Fnc) (void*, void*);
+typedef int (*List_Cmp_Fnc) (const void*, const void*);
 /*
  *  @brief A function used to free data within a list.
  *  @param void* The data to free.
@@ -40,7 +40,7 @@ typedef void (*List_Free_Fnc) (void*);
  *  @param void* The data to perform the test on.
  *  @return bool True should indicate a passed test and false should indicate a failed test.
  */
-typedef bool (*List_Find_Fnc) (void*);
+typedef bool (*List_Find_Fnc) (const void*);
 /*
  *  @brief A function used to perform an action using data within a list.
  *  @param void* The data to perform a task on.
@@ -50,10 +50,16 @@ typedef void (*List_Do_Fnc) (void*);
 /*
  *  @brief A function used to perform reduction on a list.
  *  @param void* The data to perform a single reduction.
- *  @param void* The value of the accumulator at it current state.
+ *  @param void* The value of the accumulator at it current state. This should not be altered
  *  @return void The value of the accumulator after reduction.
  */
-typedef int (*List_Reduce_Fnc) (void*, int);
+typedef int (*List_Reduce_Fnc) (const void*, int);
+/*
+ *  @brief A function used to perform a copy of a value and return a pointer to the newly created data.
+ *  @param void* The data to perform a copy on. This should not be altered
+ *  @return void* A pointer to the newly copied data.
+ */
+typedef void* (*List_Copy_Fnc) (const void*);
 
 /*
  *  @brief The list itself.
@@ -69,6 +75,17 @@ typedef struct List_t List_t;
  *  @return List_t* A pointer to the allocated list or NULL on error.
  */
 List_t* List_Create(size_t, List_Cmp_Fnc, List_Free_Fnc);
+
+/*
+ *  @brief Copy that the given list is valid.
+ *  @param List_t* The list to copy.
+ *  @param List_Copy_Fnc A user provided function to copy node values.
+			If Null is passed, a shallow copy will be formed where:
+				Each node value is the same pointer
+				The list itself will be in different
+ *  @return List_t* A pointer to the allocated list or NULL on error.
+ */
+List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node);
 
 /*
  *  @brief Verify that the given list is valid.
