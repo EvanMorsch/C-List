@@ -157,6 +157,9 @@ List_Error_t List_For_Each(List_t*, List_Do_Fnc);
  *  @brief Find the first instance of a given search data using the defined compare function.
  *  @param void* The data to use as a 'search term'.
  *  @param List_t* The list that should contain the given search term.
+ 		The function uses the list's cmp function to decide if a node is "equal" to the search term.
+		 If the cmp function is not defined, the function will assume that all nodes are the same,
+		 	therefore returning the first node it 'sees'.
  *  @param size_t* A pointer in which to put the index if any should be found.
 	   Note that this will not be changed if no match is found.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
