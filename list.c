@@ -159,6 +159,37 @@ static void List_Node_Destroy(List_Node* node)
 }
 
 /*
+ *  @brief Check a list for sortedness. 
+ *  @param List_t* A pointer to the list to check for sortedness.
+			A list is considered sorted when each node's precedence is ordered from high to low
+ *  @return bool True if sorted fully, false otherwise
+ */
+static bool List_Is_Sorted(List_t* list_p)
+{
+	//check params
+	if (NULL == list_p)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	//loop through every node until the second to last one
+	for(size_t i = 0; i < list_p->length-1; i++)
+	{
+		//compare current and next node
+		List_Node* current_node = List_Node_At(i, list_p);
+		if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
+		int node_cmp = list_p->cmp(
+			current_node,
+			current_node->next_p
+		);
+		if (0 > node_cmp)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+/*
  *  @brief Swap list indexes of two given nodes.
  *  @param List_Node* A pointer to the first node to swap.
  *  @param List_Node* A pointer to the second node to swap.
@@ -373,6 +404,9 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
  *  @brief Find the first instance of a given search data using the defined compare function.
  *  @param void* The data to use as a 'search term'.
  *  @param List_t* The list that should contain the given search term.
+ 		The function uses the list's cmp function to decide if a node is "equal" to the search term.
+		 If the cmp function is not defined, the function will assume that all nodes are the same,
+		 	therefore returning the first node it 'sees'.
  *  @param size_t* A pointer in which to put the index if any should be found.
 	   Note that this will not be changed if no match is found.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
@@ -784,6 +818,31 @@ List_Error_t List_Reverse(List_t* list_p)
  */
 List_Error_t List_Sort(List_t* list_p)
 {
-	(void)list_p;
-	return LIST_ERROR_FAILURE;
+	if (NULL == list_p)
+	{
+		return LIST_ERROR_INVALID_PARAM;
+	}
+	while(!List_Is_Sorted(list_p))
+	{
+		//loop through every node until the second to last one
+		for(size_t i = 0; i < list_p->length-1; i++)
+		{
+			//compare current and next node
+			List_Node* current_node = List_Node_At(i, list_p);
+			if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
+			int node_cmp = list_p->cmp(
+				current_node,
+				current_node->next_p
+			);
+			if (0 > node_cmp)
+			{
+				List_Error_t could_swap = List_Node_Swap(
+					List_Node_At(i, list_p),
+					List_Node_At(i+1, list_p)
+				);
+				if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+			}
+		}
+	}
+	return LIST_ERROR_SUCCESS;
 }
