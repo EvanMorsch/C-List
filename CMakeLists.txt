@@ -14,7 +14,7 @@ if (TEST)
 
     enable_testing()
 
-    list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+    list(APPEND CMAKE_CTEST_ARGUMENTS "--verbose")
 
     include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 

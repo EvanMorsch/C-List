@@ -421,7 +421,7 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p)
 
 /*
  *  @brief Put data into the given index of a given list.
- *  @param void* The data to insert to the end of the list.
+ *  @param void* The data to insert to the list.
  *  @param size_t The index in which to insert the given data to.
  *  @param List_t* The list that should contain the given node.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
@@ -438,7 +438,7 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
 	//make sure it was allocated properly
 	if (NULL == new_node_p)
 	{
-		return LIST_ERROR_INVALID_PARAM;
+		return LIST_ERROR_BAD_ENTRY;
 	}
 	//at is checked in insert node
 	return List_Node_Insert(new_node_p, at, list_p);
