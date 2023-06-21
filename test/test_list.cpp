@@ -46,7 +46,7 @@ int test_val3 = 63;
 
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
 
-        List_Purge(list_p); //just make sure nothign crashes
+        List_Purge(test_list); //just make sure nothign crashes
 
         List_Destroy(test_list);
     }
@@ -167,7 +167,7 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List length with improper args
+    //Test List remove at with improper args
     TEST(ListRemoveAtTest, InvalidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
@@ -177,6 +177,37 @@ int test_val3 = 63;
         EXPECT_EQ(List_Remove_At(1, test_list), nullptr);//oob entry
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Remove_At(0, NULL), nullptr);//bad args
+
+        List_Destroy(test_list);
+    }
+//}
+//List_Delete_At
+//{
+    //Tests a valid usage
+    TEST(ListDeleteAtTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 2);
+
+        List_Delete_At(1, test_list);
+        EXPECT_EQ(List_Length(test_list), 1);
+        List_Delete_At(0, test_list);//last entry
+        EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
+    }
+    //Test List delete at with improper args
+    TEST(ListDeleteAtTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 1);
+
+        List_Delete_At(1, test_list);//oob entry
+        EXPECT_EQ(List_Length(test_list), 1);
+        List_Delete_At(0, NULL);//bad args
 
         List_Destroy(test_list);
     }
@@ -201,7 +232,7 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List length with improper args
+    //Test List pop with improper args
     TEST(ListPopTest, InvalidArgs) {
         EXPECT_EQ(List_Pop(NULL), nullptr); //bad args
     }
@@ -223,7 +254,7 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List length with improper args
+    //Test List shift with improper args
     TEST(ListShiftTest, InvalidArgs) {
         EXPECT_EQ(List_Shift(NULL), nullptr); //bad args
     }
