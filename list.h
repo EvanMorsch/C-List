@@ -50,7 +50,7 @@ typedef void (*List_Do_Fnc) (void*);
 /*
  *  @brief A function used to perform reduction on a list.
  *  @param void* The data to perform a single reduction.
- *  @param void* The value of the accumulator at it current state. This should not be altered
+ *  @param int The value of the accumulator at it current state
  *  @return void The value of the accumulator after reduction.
  */
 typedef int (*List_Reduce_Fnc) (const void*, int);

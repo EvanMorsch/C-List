@@ -22,6 +22,11 @@ bool is_not_255(const void* a)
     return true;
 }
 
+int avg_reducer(const void* a, int acc)
+{
+    return acc + *(int*)a;
+}
+
 int test_val1 = 255;
 int test_val2 = 127;
 int test_val3 = 63;
@@ -363,5 +368,33 @@ int test_val3 = 63;
     //Test List find with improper args
     TEST(ListFindTest, InvalidArgs) {
         EXPECT_EQ(List_Find(0, NULL, NULL), LIST_ERROR_INVALID_PARAM); //bad arg
+    }
+//}
+//List_Reduce
+//{
+    //Tests a valid usage
+    TEST(ListReduceTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 2);
+
+        int accumulator = 0;
+        EXPECT_EQ(List_Reduce(test_list, avg_reducer, &accumulator), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(accumulator, 255+127);
+
+        List_Destroy(test_list);
+    }
+    //Test List reduce with improper args
+    TEST(ListReduceTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        int accumulator = 0;
+        EXPECT_EQ(List_Reduce(test_list, avg_reducer, NULL), LIST_ERROR_INVALID_PARAM); //bad arg
+        EXPECT_EQ(List_Reduce(test_list, NULL, &accumulator), LIST_ERROR_INVALID_PARAM); //bad arg
+        EXPECT_EQ(List_Reduce(NULL, avg_reducer, &accumulator), LIST_ERROR_INVALID_PARAM); //bad arg
+
+        List_Destroy(test_list);
     }
 //}
