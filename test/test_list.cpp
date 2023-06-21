@@ -16,6 +16,8 @@ void test_free_fnc(void* a)
 }
 
 int test_val1 = 255;
+int test_val2 = 127;
+int test_val3 = 63;
 
 //List_Create
 //{
@@ -95,6 +97,29 @@ int test_val1 = 255;
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_EXCEED_LIMIT); //LIST_ERROR_EXCEED_LIMIT
     }
 //}
+//List_Pop
+//{
+    //Tests a valid usage
+    TEST(ListPopTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Pop(test_list), &test_val3);//remove entry
+        EXPECT_EQ(List_Length(test_list), 2);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);//remove entry
+        EXPECT_EQ(List_Length(test_list), 1);
+        EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
+        EXPECT_EQ(List_Length(test_list), 0);
+    }
+    //Test List length with improper args
+    TEST(ListPopTest, InvalidArgs) {
+        EXPECT_EQ(List_Pop(NULL), nullptr); //bad args
+    }
+//}
 //List_Length
 //{
     //Tests a valid usage
@@ -104,7 +129,7 @@ int test_val1 = 255;
         EXPECT_EQ(List_Length(test_list), 0);
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
         EXPECT_EQ(List_Length(test_list), 1);
-        EXPECT_NE(List_Pop(test_list), nullptr);//remove entry
+        EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
         EXPECT_EQ(List_Length(test_list), 0);
     }
     //Test List length with improper args
