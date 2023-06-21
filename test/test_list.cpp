@@ -299,7 +299,7 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List delete at with improper args
+    //Test List verify at with improper args
     TEST(ListVerifyTest, InvalidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
@@ -309,6 +309,33 @@ int test_val3 = 63;
 
         EXPECT_EQ(List_Verify(test_list, NULL), LIST_ERROR_SUCCESS);
         EXPECT_EQ(List_Verify(test_list, is_not_255), LIST_ERROR_BAD_ENTRY);
+
+        List_Destroy(test_list);
+    }
+//}
+//List_At
+//{
+    //Tests a valid usage
+    TEST(ListAtTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_At(0, test_list), &test_val1);
+        EXPECT_EQ(List_At(1, test_list), &test_val2);
+        EXPECT_EQ(List_At(2, test_list), &test_val3);
+
+        List_Destroy(test_list);
+    }
+    //Test List verify at with improper args
+    TEST(ListAtTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_At(0, test_list), nullptr); //oob
+        EXPECT_EQ(List_At(1, NULL), nullptr);
 
         List_Destroy(test_list);
     }
