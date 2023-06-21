@@ -15,6 +15,12 @@ void test_free_fnc(void* a)
     (void)a;
     return;
 }
+//test List_Find_Fnc
+bool is_not_255(const void* a)
+{
+    if (*(int*)a == 255) return false;
+    return true;
+}
 
 int test_val1 = 255;
 int test_val2 = 127;
@@ -68,6 +74,25 @@ int test_val3 = 63;
     //Test List destroy with improper args
     TEST(ListDestroyTest, InvalidArgs) {
         List_Destroy(NULL); //just make sure nothign crashes
+    }
+//}
+//List_Length
+//{
+    //Tests a valid usage
+    TEST(ListLengthTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Length(test_list), 0);
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 1);
+        EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
+        EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
+    }
+    //Test List length with improper args
+    TEST(ListLengthTest, InvalidArgs) {
+        EXPECT_EQ(List_Length(NULL), 0); //bad args
     }
 //}
 //List_Insert  
@@ -259,22 +284,32 @@ int test_val3 = 63;
         EXPECT_EQ(List_Shift(NULL), nullptr); //bad args
     }
 //}
-//List_Length
+//List_Verify
 //{
     //Tests a valid usage
-    TEST(ListLengthTest, ValidArgs) {
+    TEST(ListVerifyTest, ValidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Length(test_list), 0);
-        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
-        EXPECT_EQ(List_Length(test_list), 1);
-        EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
-        EXPECT_EQ(List_Length(test_list), 0);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 2);
+
+        EXPECT_EQ(List_Verify(test_list, NULL), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Verify(test_list, is_not_255), LIST_ERROR_SUCCESS);
 
         List_Destroy(test_list);
     }
-    //Test List length with improper args
-    TEST(ListLengthTest, InvalidArgs) {
-        EXPECT_EQ(List_Length(NULL), 0); //bad args
+    //Test List delete at with improper args
+    TEST(ListVerifyTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 2);
+
+        EXPECT_EQ(List_Verify(test_list, NULL), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Verify(test_list, is_not_255), LIST_ERROR_BAD_ENTRY);
+
+        List_Destroy(test_list);
     }
 //}

@@ -302,7 +302,7 @@ List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node_fnc)
 		return NULL;
 	}
 	
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		List_Error_t could_push;
 		if (NULL == copy_node_fnc)
@@ -340,7 +340,7 @@ List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check)
 	
 	//keep count of nodes to verify size
 	size_t actual_length = 0;
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		//user validity check
 		if (NULL != valid_check && !valid_check(current_node->data_p))
@@ -514,7 +514,7 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 		return false;
 	}
 	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -551,7 +551,7 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 		return false;
 	}
 	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
@@ -583,7 +583,7 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 		return false;
 	}
 	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -713,7 +713,7 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulat
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	
-	for (List_Node* current_node = list_p->head_p; current_node->next_p != NULL; current_node = current_node->next_p)
+	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
