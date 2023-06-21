@@ -299,7 +299,7 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List verify at with improper args
+    //Test List verify with improper args
     TEST(ListVerifyTest, InvalidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
@@ -330,8 +330,37 @@ int test_val3 = 63;
 
         List_Destroy(test_list);
     }
-    //Test List verify at with improper args
+    //Test List at with improper args
     TEST(ListAtTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_At(0, test_list), nullptr); //oob
+        EXPECT_EQ(List_At(1, NULL), nullptr);
+
+        List_Destroy(test_list);
+    }
+//}
+//List_Find
+//{
+    //Tests a valid usage
+    TEST(ListFindTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 2);
+
+        size_t response_index = 255; //will be overwreitten
+        EXPECT_EQ(List_Find(&test_val2, test_list, &response_index), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(response_index, 1);
+        response_index = 255; //reset for verification
+        EXPECT_EQ(List_Find(&test_val3, test_list, &response_index), LIST_ERROR_EXCEED_LIMIT); //not in list
+        EXPECT_EQ(response_index, 255);
+
+        List_Destroy(test_list);
+    }
+    //Test List find with improper args
+    TEST(ListFindTest, InvalidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
         EXPECT_EQ(List_At(0, test_list), nullptr); //oob

@@ -453,7 +453,8 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
 		 	therefore returning the first node it 'sees'.
  *  @param size_t* A pointer in which to put the index if any should be found.
 	   Note that this will not be changed if no match is found.
- *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
+ *  @return List_Error_t LIST_ERROR_SUCCESS on successful find, LIST_ERROR_EXCEED_LIMIT if not found in list,
+ 						or any error that may occur.
  */
 List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 {
@@ -483,8 +484,8 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 				{
 					*response = i;
 				}
-				//stop search loop
-				break;
+				//return success code
+				return LIST_ERROR_SUCCESS;
 			}
 			//otherwise, just try the next node
 			current_node = current_node->next_p;
@@ -495,8 +496,8 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 			return LIST_ERROR_BAD_ENTRY;
 		}
 	}
-	//return the node or NULL if an issue arose
-	return LIST_ERROR_SUCCESS;
+	//return success code
+	return LIST_ERROR_EXCEED_LIMIT;
 }
 
 /*
