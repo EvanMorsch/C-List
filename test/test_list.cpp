@@ -23,13 +23,31 @@ int test_val3 = 63;
 //{
     //Tests a valid usage
     TEST(ListCreateTest, ValidArgs) {
-        EXPECT_NE(List_Create(10, test_cmp_fnc, test_free_fnc), nullptr); //all valid args
-        EXPECT_NE(List_Create(10, NULL, test_free_fnc), nullptr); //null cmp is allowed
+        List_t* test_list1 = List_Create(10, test_cmp_fnc, test_free_fnc);
+        EXPECT_NE(test_list1, nullptr); //all valid args
+        List_t* test_list2 = List_Create(10, NULL, test_free_fnc);
+        EXPECT_NE(test_list2, nullptr); //null cmp is allowed
+
+        List_Destroy(test_list1);
+        List_Destroy(test_list2);
     }
     //Test List create with improper args
     TEST(ListCreateTest, InvalidArgs) {
         EXPECT_EQ(List_Create(0, test_cmp_fnc, test_free_fnc), nullptr); //must allow atleast a single node
         EXPECT_EQ(List_Create(10, test_cmp_fnc, NULL), nullptr); //null free not allowed
+    }
+//}
+//List_Destroy
+//{
+    //Tests a valid usage
+    TEST(ListDestroyTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        List_Destroy(test_list); //just make sure nothign crashes
+    }
+    //Test List destroy with improper args
+    TEST(ListDestroyTest, InvalidArgs) {
+        List_Destroy(NULL); //just make sure nothign crashes
     }
 //}
 //List_Insert  
@@ -42,6 +60,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Insert(&test_val1, 1, test_list), LIST_ERROR_SUCCESS); //back of list
         EXPECT_EQ(List_Insert(&test_val1, 0, test_list), LIST_ERROR_SUCCESS); //front of list
         EXPECT_EQ(List_Insert(&test_val1, 1, test_list), LIST_ERROR_SUCCESS); //mid of list
+
+        List_Destroy(test_list);
 
         //i dont like that this test doesnt accurately test the validity of each entry...
     }
@@ -56,6 +76,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Insert(&test_val1, 0, test_list), LIST_ERROR_SUCCESS); //populate for later
 
         EXPECT_EQ(List_Insert(&test_val1, 0, test_list), LIST_ERROR_EXCEED_LIMIT); //LIST_ERROR_EXCEED_LIMIT
+
+        List_Destroy(test_list);
     }
 //}
 //List_Push/List_Unshift 
@@ -66,6 +88,8 @@ int test_val3 = 63;
 
         EXPECT_EQ(List_Unshift(&test_val1, test_list), LIST_ERROR_SUCCESS); //first node in list
         EXPECT_EQ(List_Unshift(&test_val1, test_list), LIST_ERROR_SUCCESS); //not first
+
+        List_Destroy(test_list);
     }
     //Test List unshift with improper args
     TEST(ListUnshiftTest, InvalidArgs) {
@@ -77,6 +101,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Unshift(&test_val1, test_list), LIST_ERROR_SUCCESS); //populate for case
 
         EXPECT_EQ(List_Unshift(&test_val1, test_list), LIST_ERROR_EXCEED_LIMIT); //LIST_ERROR_EXCEED_LIMIT
+
+        List_Destroy(test_list);
     }
     //Tests a valid usage
     TEST(ListPushTest, ValidArgs) {
@@ -84,6 +110,8 @@ int test_val3 = 63;
 
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS); //first node in list
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS); //not first
+
+        List_Destroy(test_list);
     }
     //Test List push with improper args
     TEST(ListPushTest, InvalidArgs) {
@@ -95,6 +123,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS); //populate for next case
 
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_EXCEED_LIMIT); //LIST_ERROR_EXCEED_LIMIT
+
+        List_Destroy(test_list);
     }
 //}
 //List_Remove_At
@@ -114,6 +144,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Remove_At(0, test_list), &test_val1);//first/only entry
         EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
     }
     //Test List length with improper args
     TEST(ListRemoveAtTest, InvalidArgs) {
@@ -125,6 +157,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Remove_At(1, test_list), nullptr);//oob entry
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Remove_At(0, NULL), nullptr);//bad args
+
+        List_Destroy(test_list);
     }
 //}
 //List_Pop/List_Shift
@@ -144,6 +178,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
         EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
     }
     //Test List length with improper args
     TEST(ListPopTest, InvalidArgs) {
@@ -164,6 +200,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Shift(test_list), &test_val3);//remove entry
         EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
     }
     //Test List length with improper args
     TEST(ListShiftTest, InvalidArgs) {
@@ -181,6 +219,8 @@ int test_val3 = 63;
         EXPECT_EQ(List_Length(test_list), 1);
         EXPECT_EQ(List_Pop(test_list), &test_val1);//remove entry
         EXPECT_EQ(List_Length(test_list), 0);
+
+        List_Destroy(test_list);
     }
     //Test List length with improper args
     TEST(ListLengthTest, InvalidArgs) {
