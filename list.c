@@ -787,13 +787,10 @@ void List_Purge(List_t* list_p)
 	{
 		return;
 	}
-	//remove all list members and destroy each
-	List_Node* shifted_head = List_Shift(list_p);
-	while (NULL != shifted_head)
+	//delete all list members until length is 0
+	while (List_Length(list_p))
 	{
-		List_Node_Destroy(shifted_head);
-		//get the next node
-		shifted_head = List_Shift(list_p);
+		List_Delete_At(0, list_p);
 	}
 	return;
 }

@@ -12,7 +12,8 @@ int test_cmp_fnc(const void* a, const void* b)
 }
 void test_free_fnc(void* a)
 {
-        free(a);
+    (void)a;
+    return;
 }
 
 int test_val1 = 255;
@@ -37,11 +38,30 @@ int test_val3 = 63;
         EXPECT_EQ(List_Create(10, test_cmp_fnc, NULL), nullptr); //null free not allowed
     }
 //}
+//List_Purge
+//{
+    //Tests a valid usage
+    TEST(ListPurgeTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+
+        List_Purge(list_p); //just make sure nothign crashes
+
+        List_Destroy(test_list);
+    }
+    //Test List purge with improper args
+    TEST(ListPurgeTest, InvalidArgs) {
+        List_Purge(NULL); //just make sure nothign crashes
+    }
+//}
 //List_Destroy
 //{
     //Tests a valid usage
     TEST(ListDestroyTest, ValidArgs) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
 
         List_Destroy(test_list); //just make sure nothign crashes
     }
