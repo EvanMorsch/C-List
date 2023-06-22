@@ -8,7 +8,7 @@ extern "C"
 int test_cmp_fnc(const void* a, const void* b)
 {
         if (NULL == a || NULL == b) return 0;
-        return (*(int*)a)-(*(int*)b);
+        return (*(int*)b)-(*(int*)a);
 }
 void test_free_fnc(void* a)
 {
@@ -21,12 +21,25 @@ bool is_not_255(const void* a)
     if (*(int*)a == 255) return false;
     return true;
 }
-
+//test List_Find_Fnc
+void* double_int(const void* a)
+{
+    void* ret_int = malloc(sizeof(int));
+    *(int*)ret_int = (*(int*)a) * 2;
+    return ret_int;
+}
+//test List_do_fnc
+void half_int(void* a)
+{
+    *(int*)a /= 2;
+}
+//test List_Reduce_Fnc
 int avg_reducer(const void* a, int acc)
 {
     return acc + *(int*)a;
 }
 
+//test values for list population
 int test_val1 = 255;
 int test_val2 = 127;
 int test_val3 = 63;
@@ -97,7 +110,7 @@ int test_val3 = 63;
     }
     //Test List length with improper args
     TEST(ListLengthTest, InvalidArgs) {
-        EXPECT_EQ(List_Length(NULL), 0); //bad args
+        EXPECT_EQ(List_Length(NULL), 0);  
     }
 //}
 //List_Insert  
@@ -119,9 +132,9 @@ int test_val3 = 63;
     TEST(ListInsertTest, InvalidArgs) {
         List_t* test_list = List_Create(1, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Insert(&test_val1, 0, NULL), LIST_ERROR_INVALID_PARAM); //bad args
-        EXPECT_EQ(List_Insert(NULL, 0, test_list), LIST_ERROR_INVALID_PARAM); //bad args
-        EXPECT_EQ(List_Insert(&test_val1, 1, test_list), LIST_ERROR_INVALID_PARAM); //bad args (invalid location)
+        EXPECT_EQ(List_Insert(&test_val1, 0, NULL), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Insert(NULL, 0, test_list), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Insert(&test_val1, 1, test_list), LIST_ERROR_INVALID_PARAM);
 
         EXPECT_EQ(List_Insert(&test_val1, 0, test_list), LIST_ERROR_SUCCESS); //populate for later
 
@@ -145,8 +158,8 @@ int test_val3 = 63;
     TEST(ListUnshiftTest, InvalidArgs) {
         List_t* test_list = List_Create(1, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Unshift(&test_val1, NULL), LIST_ERROR_INVALID_PARAM); //bad args
-        EXPECT_EQ(List_Unshift(NULL, test_list), LIST_ERROR_INVALID_PARAM); //bad args
+        EXPECT_EQ(List_Unshift(&test_val1, NULL), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Unshift(NULL, test_list), LIST_ERROR_INVALID_PARAM);  
 
         EXPECT_EQ(List_Unshift(&test_val1, test_list), LIST_ERROR_SUCCESS); //populate for case
 
@@ -167,8 +180,8 @@ int test_val3 = 63;
     TEST(ListPushTest, InvalidArgs) {
         List_t* test_list = List_Create(1, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Push(&test_val1, NULL), LIST_ERROR_INVALID_PARAM); //bad args
-        EXPECT_EQ(List_Push(NULL, test_list), LIST_ERROR_INVALID_PARAM); //bad args
+        EXPECT_EQ(List_Push(&test_val1, NULL), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Push(NULL, test_list), LIST_ERROR_INVALID_PARAM);  
 
         EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS); //populate for next case
 
@@ -206,7 +219,7 @@ int test_val3 = 63;
 
         EXPECT_EQ(List_Remove_At(1, test_list), nullptr);//oob entry
         EXPECT_EQ(List_Length(test_list), 1);
-        EXPECT_EQ(List_Remove_At(0, NULL), nullptr);//bad args
+        EXPECT_EQ(List_Remove_At(0, NULL), nullptr); 
 
         List_Destroy(test_list);
     }
@@ -237,7 +250,7 @@ int test_val3 = 63;
 
         List_Delete_At(1, test_list);//oob entry
         EXPECT_EQ(List_Length(test_list), 1);
-        List_Delete_At(0, NULL);//bad args
+        List_Delete_At(0, NULL); 
 
         List_Destroy(test_list);
     }
@@ -264,7 +277,7 @@ int test_val3 = 63;
     }
     //Test List pop with improper args
     TEST(ListPopTest, InvalidArgs) {
-        EXPECT_EQ(List_Pop(NULL), nullptr); //bad args
+        EXPECT_EQ(List_Pop(NULL), nullptr);  
     }
     //Tests a valid usage
     TEST(ListShiftTest, ValidArgs) {
@@ -286,7 +299,7 @@ int test_val3 = 63;
     }
     //Test List shift with improper args
     TEST(ListShiftTest, InvalidArgs) {
-        EXPECT_EQ(List_Shift(NULL), nullptr); //bad args
+        EXPECT_EQ(List_Shift(NULL), nullptr);  
     }
 //}
 //List_Verify
@@ -367,7 +380,7 @@ int test_val3 = 63;
     }
     //Test List find with improper args
     TEST(ListFindTest, InvalidArgs) {
-        EXPECT_EQ(List_Find(0, NULL, NULL), LIST_ERROR_INVALID_PARAM); //bad arg
+        EXPECT_EQ(List_Find(0, NULL, NULL), LIST_ERROR_INVALID_PARAM);  
     }
 //}
 //List_Reduce
@@ -391,9 +404,321 @@ int test_val3 = 63;
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
         int accumulator = 0;
-        EXPECT_EQ(List_Reduce(test_list, avg_reducer, NULL), LIST_ERROR_INVALID_PARAM); //bad arg
-        EXPECT_EQ(List_Reduce(test_list, NULL, &accumulator), LIST_ERROR_INVALID_PARAM); //bad arg
-        EXPECT_EQ(List_Reduce(NULL, avg_reducer, &accumulator), LIST_ERROR_INVALID_PARAM); //bad arg
+        EXPECT_EQ(List_Reduce(test_list, avg_reducer, NULL), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Reduce(test_list, NULL, &accumulator), LIST_ERROR_INVALID_PARAM);  
+        EXPECT_EQ(List_Reduce(NULL, avg_reducer, &accumulator), LIST_ERROR_INVALID_PARAM);  
+
+        List_Destroy(test_list);
+    }
+//}
+
+//List_Copy
+//{
+    //Tests a valid usage
+    TEST(ListCopyTest, DefaultArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        List_t* test_list2 = List_Copy(test_list, NULL);
+
+        EXPECT_EQ(List_Pop(test_list2), &test_val3);
+        EXPECT_EQ(List_Length(test_list2), 2);
+        EXPECT_EQ(List_Pop(test_list2), &test_val2);
+        EXPECT_EQ(List_Length(test_list2), 1);
+        EXPECT_EQ(List_Pop(test_list2), &test_val1);
+        EXPECT_EQ(List_Length(test_list2), 0);
+
+        EXPECT_EQ(List_Length(test_list), 3); //make sure original is untouched
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+        List_Destroy(test_list2);
+    }
+    //Tests a valid usage
+    TEST(ListCopyTest, CustomArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        List_t* test_list2 = List_Copy(test_list, double_int);
+
+        EXPECT_EQ(List_Length(test_list2), 3);
+        void* pop1 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 2);
+        void* pop2 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 1);
+        void* pop3 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 0);
+
+        EXPECT_EQ(*(int*)pop1, *(int*)double_int(&test_val3));
+        EXPECT_EQ(*(int*)pop2, *(int*)double_int(&test_val2));
+        EXPECT_EQ(*(int*)pop3, *(int*)double_int(&test_val1));
+        free(pop1);
+        free(pop2);
+        free(pop3);
+
+        EXPECT_EQ(List_Length(test_list), 3); //make sure original is untouched
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+        List_Destroy(test_list2);
+    }
+    //Test List copy with improper args
+    TEST(ListCopyTest, InvalidArgs) {
+        EXPECT_EQ(List_Copy(NULL, NULL), nullptr);  
+    }
+//}
+//List_Some
+//{
+    //Tests a valid usage
+    TEST(ListSomeTest, ValidPassCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Some(test_list, is_not_255), true);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListSomeTest, ValidFailCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Some(test_list, is_not_255), false);
+
+        List_Destroy(test_list);
+    }
+    //Test List some with improper args
+    TEST(ListSomeTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Some(NULL, NULL), false);  
+        EXPECT_EQ(List_Some(NULL, is_not_255), false);  
+        EXPECT_EQ(List_Some(test_list, NULL), false);  
+
+        List_Destroy(test_list);
+    }
+//}
+//List_Every
+//{
+    //Tests a valid usage
+    TEST(ListEveryTest, ValidFailCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Every(test_list, is_not_255), true);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListEveryTest, ValidPassCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Every(test_list, is_not_255), false);
+
+        List_Destroy(test_list);
+    }
+    //Test List every with improper args
+    TEST(ListEveryTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Every(NULL, NULL), false);  
+        EXPECT_EQ(List_Every(NULL, is_not_255), false);  
+        EXPECT_EQ(List_Every(test_list, NULL), false);  
+
+        List_Destroy(test_list);
+    }
+//}
+//List_Reverse
+//{
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidEven) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 4);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidOdd) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List reverse with improper args
+    TEST(ListReverseTest, InvalidArgs) {
+        EXPECT_EQ(List_Reverse(NULL), LIST_ERROR_INVALID_PARAM);  
+    }
+//}
+//List_Filter
+//{
+    //Tests a valid usage
+    TEST(ListFilterTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Filter(test_list, is_not_255), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Length(test_list), 2);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListFilterTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Filter(test_list, is_not_255), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List filter with improper args
+    TEST(ListFilterTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Filter(NULL, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_Filter(test_list, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_Filter(NULL, is_not_255), LIST_ERROR_INVALID_PARAM);
+
+        List_Destroy(test_list);
+    }
+//}
+//List_Sort
+//{
+    //Tests a valid usage
+    TEST(ListSortTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Sort(test_list), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Length(test_list), 3);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListSortTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Sort(test_list), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List sort with improper args
+    TEST(ListSortTest, InvalidArgs) {
+        EXPECT_EQ(List_Sort(NULL), LIST_ERROR_INVALID_PARAM);
+    }
+//}
+//List_For_Each
+//{
+    //Tests a valid usage
+    TEST(ListForEachTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        int old_val1 = test_val1;
+        int old_val2 = test_val2;
+        int old_val3 = test_val3;
+
+        EXPECT_EQ(List_For_Each(test_list,  half_int), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Length(test_list), 3);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val3 / 2);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val2 / 2);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val1 / 2);
+
+        //reset for later just in case more tests need it
+        test_val1 = old_val1;
+        test_val2 = old_val2;
+        test_val2 = old_val3;
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListForEachTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_For_Each(test_list,  half_int), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List for each with improper args
+    TEST(ListForEachTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_For_Each(NULL, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_For_Each(test_list, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_For_Each(NULL,  half_int), LIST_ERROR_INVALID_PARAM);
 
         List_Destroy(test_list);
     }
