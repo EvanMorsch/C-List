@@ -28,6 +28,11 @@ void* double_int(const void* a)
     *(int*)ret_int = (*(int*)a) * 2;
     return ret_int;
 }
+//test List_do_fnc
+void half_int(void* a)
+{
+    *(int*)a /= 2;
+}
 
 int avg_reducer(const void* a, int acc)
 {
@@ -667,5 +672,53 @@ int test_val3 = 63;
     //Test List sort with improper args
     TEST(ListSortTest, InvalidArgs) {
         EXPECT_EQ(List_Sort(NULL), LIST_ERROR_INVALID_PARAM);
+    }
+//}
+//List_For_Each
+//{
+    //Tests a valid usage
+    TEST(ListForEachTest, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        int old_val1 = test_val1;
+        int old_val2 = test_val2;
+        int old_val3 = test_val3;
+
+        EXPECT_EQ(List_For_Each(test_list,  half_int), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Length(test_list), 3);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val3 / 2);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val2 / 2);
+        EXPECT_EQ(*(int*)List_Pop(test_list), old_val1 / 2);
+
+        //reset for later just in case more tests need it
+        test_val1 = old_val1;
+        test_val2 = old_val2;
+        test_val2 = old_val3;
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListForEachTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_For_Each(test_list,  half_int), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List for each with improper args
+    TEST(ListForEachTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_For_Each(NULL, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_For_Each(test_list, NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_For_Each(NULL,  half_int), LIST_ERROR_INVALID_PARAM);
+
+        List_Destroy(test_list);
     }
 //}

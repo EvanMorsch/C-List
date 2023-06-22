@@ -578,7 +578,7 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 	//check params
 	if (NULL == list_p || NULL == do_fnc)
 	{
-		return false;
+		return LIST_ERROR_INVALID_PARAM;
 	}
 	//loop till the end
 	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
