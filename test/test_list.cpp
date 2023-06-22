@@ -34,9 +34,10 @@ void half_int(void* a)
     *(int*)a /= 2;
 }
 //test List_Reduce_Fnc
-int avg_reducer(const void* a, int acc)
+void* avg_reducer(const void* a, void* acc)
 {
-    return acc + *(int*)a;
+    *(int*)acc += *(int*)a;
+    return acc;
 }
 
 //test values for list population

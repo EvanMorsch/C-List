@@ -162,6 +162,8 @@ static void List_Node_Destroy(List_Node* node)
  *  @brief Check a list for sortedness. 
  *  @param List_t* A pointer to the list to check for sortedness.
 			A list is considered sorted when each node's precedence is ordered from high to low
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return bool True if sorted fully, false otherwise
  */
 static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc)
@@ -715,10 +717,10 @@ void* List_Shift(List_t* list_p)
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
  *  @param list_reduce_fnc The function used to reduce each node.
- *  @param int The value to begin reduction with.
+ *  @param void* The value to begin reduction with.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulator)
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator)
 {
 	//check params
 	if (NULL == list_p || NULL == reducer || NULL == accumulator)
@@ -732,7 +734,7 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulat
 		//im not including contingency "else" on purpose
 		if (NULL != current_node)
 		{
-			*accumulator = reducer(current_node->data_p, *accumulator);
+			accumulator = reducer(current_node->data_p, accumulator);
 		}
 	}
 	return LIST_ERROR_SUCCESS;
@@ -871,6 +873,8 @@ List_Error_t List_Reverse(List_t* list_p)
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
 List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
