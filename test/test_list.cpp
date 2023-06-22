@@ -21,6 +21,13 @@ bool is_not_255(const void* a)
     if (*(int*)a == 255) return false;
     return true;
 }
+//test List_Find_Fnc
+void* double_int(const void* a)
+{
+    void* ret_int = malloc(sizeof(int));
+    *(int*)ret_int = (*(int*)a) * 2;
+    return ret_int;
+}
 
 int avg_reducer(const void* a, int acc)
 {
@@ -398,3 +405,68 @@ int test_val3 = 63;
         List_Destroy(test_list);
     }
 //}
+
+//List_Copy
+//{
+    //Tests a valid usage
+    TEST(ListCopyTest, DefaultArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        List_t* test_list2 = List_Copy(test_list, NULL);
+
+        EXPECT_EQ(List_Pop(test_list2), &test_val3);//remove entry
+        EXPECT_EQ(List_Length(test_list2), 2);
+        EXPECT_EQ(List_Pop(test_list2), &test_val2);//remove entry
+        EXPECT_EQ(List_Length(test_list2), 1);
+        EXPECT_EQ(List_Pop(test_list2), &test_val1);//remove entry
+        EXPECT_EQ(List_Length(test_list2), 0);
+
+        EXPECT_EQ(List_Length(test_list), 3); //make sure original is untouched
+        EXPECT_EQ(List_Pop(test_list), &test_val3);//remove entry
+
+        List_Destroy(test_list);
+        List_Destroy(test_list2);
+    }
+    //Tests a valid usage
+    TEST(ListCopyTest, CustomArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);//add entry
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        List_t* test_list2 = List_Copy(test_list, double_int);
+
+        EXPECT_EQ(List_Length(test_list2), 3);
+        void* pop1 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 2);
+        void* pop2 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 1);
+        void* pop3 = List_Pop(test_list2);
+        EXPECT_EQ(List_Length(test_list2), 0);
+
+        EXPECT_EQ(*(int*)pop1, *(int*)double_int(&test_val3));
+        EXPECT_EQ(*(int*)pop2, *(int*)double_int(&test_val2));
+        EXPECT_EQ(*(int*)pop3, *(int*)double_int(&test_val1));
+        free(pop1);
+        free(pop2);
+        free(pop3);
+
+        EXPECT_EQ(List_Length(test_list), 3); //make sure original is untouched
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+        List_Destroy(test_list2);
+    }
+    //Test List copy with improper args
+    TEST(ListCopyTest, InvalidArgs) {
+        EXPECT_EQ(List_Copy(NULL, NULL), nullptr); //bad args
+    }
+//}
+

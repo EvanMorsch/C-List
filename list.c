@@ -307,14 +307,14 @@ List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node_fnc)
 		List_Error_t could_push;
 		if (NULL == copy_node_fnc)
 		{
-			could_push = List_Push(current_node->data_p, list_p);
+			could_push = List_Push(current_node->data_p, copy_list);
 		}
 		else
 		{
-			could_push = List_Push(copy_node_fnc(current_node->data_p), list_p);
+			could_push = List_Push(copy_node_fnc(current_node->data_p), copy_list);
 		}
 
-		if (LIST_ERROR_SUCCESS	!= could_push)
+		if (LIST_ERROR_SUCCESS != could_push)
 		{
 			List_Destroy(copy_list);
 			return NULL;
