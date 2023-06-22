@@ -241,8 +241,10 @@ List_Error_t List_Reverse(List_t* list_p);
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Sort(List_t* list_p);
+List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc);
 
 #endif

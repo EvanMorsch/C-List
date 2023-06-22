@@ -164,7 +164,7 @@ static void List_Node_Destroy(List_Node* node)
 			A list is considered sorted when each node's precedence is ordered from high to low
  *  @return bool True if sorted fully, false otherwise
  */
-static bool List_Is_Sorted(List_t* list_p)
+static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 {
 	//check params
 	if (NULL == list_p)
@@ -180,10 +180,21 @@ static bool List_Is_Sorted(List_t* list_p)
 		{
 			return LIST_ERROR_BAD_ENTRY;
 		}
-		int node_cmp = list_p->cmp(
-			current_node,
-			current_node->next_p
-		);
+		int node_cmp = 0;
+		if (NULL == cmp_fnc && NULL != list_p->cmp)
+		{
+			node_cmp = list_p->cmp(
+				current_node->data_p,
+				current_node->next_p->data_p
+			);
+		}
+		else if (NULL != cmp_fnc)
+		{
+			node_cmp = cmp_fnc(
+				current_node->data_p,
+				current_node->next_p->data_p
+			);
+		}
 		if (0 > node_cmp)
 		{
 			return false;
@@ -862,13 +873,13 @@ List_Error_t List_Reverse(List_t* list_p)
  *  @param List_t* The list to sort.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Sort(List_t* list_p)
+List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 {
 	if (NULL == list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	while(!List_Is_Sorted(list_p))
+	while(!List_Is_Sorted(list_p, cmp_fnc))
 	{
 		//loop through every node until the second to last one
 		for(size_t i = 0; i < list_p->length-1; i++)
@@ -879,10 +890,21 @@ List_Error_t List_Sort(List_t* list_p)
 			{
 				return LIST_ERROR_BAD_ENTRY;
 			}
-			int node_cmp = list_p->cmp(
-				current_node,
-				current_node->next_p
-			);
+			int node_cmp = 0;
+			if (NULL == cmp_fnc && NULL != list_p->cmp)
+			{
+				node_cmp = list_p->cmp(
+					current_node->data_p,
+					current_node->next_p->data_p
+				);
+			}
+			else if (NULL != cmp_fnc)
+			{
+				node_cmp = cmp_fnc(
+					current_node->data_p,
+					current_node->next_p->data_p
+				);
+			}
 			if (0 > node_cmp)
 			{
 				List_Error_t could_swap = List_Node_Swap(
