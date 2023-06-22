@@ -547,3 +547,54 @@ int test_val3 = 63;
         List_Destroy(test_list);
     }
 //}
+//List_Reverse
+//{
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidEven) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 4);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidOdd) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListReverseTest, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Reverse(test_list), LIST_ERROR_SUCCESS);
+
+        List_Destroy(test_list);
+    }
+    //Test List reverse with improper args
+    TEST(ListReverseTest, InvalidArgs) {
+        EXPECT_EQ(List_Reverse(NULL), LIST_ERROR_INVALID_PARAM); //bad arg
+    }
+//}

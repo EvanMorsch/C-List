@@ -190,7 +190,7 @@ static bool List_Is_Sorted(List_t* list_p)
 }
 
 /*
- *  @brief Swap list indexes of two given nodes.
+ *  @brief Swap the data of two given nodes.
  *  @param List_Node* A pointer to the first node to swap.
  *  @param List_Node* A pointer to the second node to swap.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
@@ -204,15 +204,12 @@ static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b)
 	}
 
 	//store tmp vals for swap
-	List_Node* tmp_next_p = node_a->next_p;
-	List_Node* tmp_previous_p = node_a->previous_p;
+	List_Node* tmp_data_p = node_a->data_p;
 
 	//change a's neighbors
-	node_a->next_p = node_b->next_p;
-	node_a->previous_p = node_b->previous_p;
-	//change b's neighbors
-	node_b->next_p = tmp_next_p;
-	node_b->previous_p = tmp_previous_p;
+	node_a->data_p = node_b->data_p;
+
+	node_b->data_p = tmp_data_p;
 
 	return LIST_ERROR_SUCCESS;
 }
@@ -845,9 +842,12 @@ List_Error_t List_Reverse(List_t* list_p)
 	{
 		List_Error_t could_swap = List_Node_Swap(
 			List_Node_At(i, list_p),
-			List_Node_At(list_p->length - i, list_p)
+			List_Node_At(list_p->length - (i + 1), list_p)
 		);
-		if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+		if (LIST_ERROR_SUCCESS != could_swap)
+		{
+			return could_swap;
+		}
 	}
 	return LIST_ERROR_SUCCESS;
 }
