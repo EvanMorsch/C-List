@@ -96,7 +96,7 @@ static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//make sure this wouldnt exceed length limits
-	if (list_p->length >= list_p->max_length)
+	if (list_p->max_length && list_p->length >= list_p->max_length)
 	{
 		return LIST_ERROR_EXCEED_LIMIT;
 	}
@@ -256,6 +256,7 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p)
 /*
  *  @brief Create an empty list.
  *  @param size_t The maximum size to allow the list to grow.
+					If 0 is passed as this value, no maximum will be enforced (Not recommended!)
  *  @param List_Cmp_Fnc A function used when comparing data within the list for matches or sorting.
  *	   Passing NULL here will cause each member to have the same precedence.
  *  @param List_Free_Fnc A function used when freeing data within the list.
@@ -263,7 +264,7 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p)
  */
 List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free)
 {
-	if (max_length <= 0 || NULL == free)
+	if (NULL == free)
 	{
 		return NULL;
 	}

@@ -52,13 +52,15 @@ int test_val3 = 63;
         EXPECT_NE(test_list1, nullptr); //all valid args
         List_t* test_list2 = List_Create(10, NULL, test_free_fnc);
         EXPECT_NE(test_list2, nullptr); //null cmp is allowed
+        List_t* test_list3 = List_Create(0, test_cmp_fnc, test_free_fnc);
+        EXPECT_NE(test_list3, nullptr); //null cmp is allowed
 
         List_Destroy(test_list1);
         List_Destroy(test_list2);
+        List_Destroy(test_list3);
     }
     //Test List create with improper args
     TEST(ListCreateTest, InvalidArgs) {
-        EXPECT_EQ(List_Create(0, test_cmp_fnc, test_free_fnc), nullptr); //must allow atleast a single node
         EXPECT_EQ(List_Create(10, test_cmp_fnc, NULL), nullptr); //null free not allowed
     }
 //}
