@@ -508,3 +508,42 @@ int test_val3 = 63;
         List_Destroy(test_list);
     }
 //}
+//List_Every
+//{
+    //Tests a valid usage
+    TEST(ListEveryTest, ValidFailCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Every(test_list, is_not_255), true);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListEveryTest, ValidPassCase) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Every(test_list, is_not_255), false);
+
+        List_Destroy(test_list);
+    }
+    //Test List every with improper args
+    TEST(ListEveryTest, InvalidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Every(NULL, NULL), false); //bad arg
+        EXPECT_EQ(List_Every(NULL, is_not_255), false); //bad arg
+        EXPECT_EQ(List_Every(test_list, NULL), false); //bad arg
+
+        List_Destroy(test_list);
+    }
+//}
