@@ -176,7 +176,10 @@ static bool List_Is_Sorted(List_t* list_p)
 	{
 		//compare current and next node
 		List_Node* current_node = List_Node_At(i, list_p);
-		if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
+		if (NULL == current_node)
+		{
+			return LIST_ERROR_BAD_ENTRY;
+		}
 		int node_cmp = list_p->cmp(
 			current_node,
 			current_node->next_p
@@ -871,7 +874,10 @@ List_Error_t List_Sort(List_t* list_p)
 		{
 			//compare current and next node
 			List_Node* current_node = List_Node_At(i, list_p);
-			if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
+			if (NULL == current_node)
+			{
+				return LIST_ERROR_BAD_ENTRY;
+			}
 			int node_cmp = list_p->cmp(
 				current_node,
 				current_node->next_p
@@ -882,7 +888,10 @@ List_Error_t List_Sort(List_t* list_p)
 					List_Node_At(i, list_p),
 					List_Node_At(i+1, list_p)
 				);
-				if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+				if (LIST_ERROR_SUCCESS != could_swap)
+				{
+					return could_swap;
+				}
 			}
 		}
 	}
