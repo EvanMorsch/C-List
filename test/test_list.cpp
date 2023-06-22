@@ -33,12 +33,13 @@ void half_int(void* a)
 {
     *(int*)a /= 2;
 }
-
+//test List_Reduce_Fnc
 int avg_reducer(const void* a, int acc)
 {
     return acc + *(int*)a;
 }
 
+//test values for list population
 int test_val1 = 255;
 int test_val2 = 127;
 int test_val3 = 63;
