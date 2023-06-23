@@ -53,7 +53,7 @@ typedef void (*List_Do_Fnc) (void*);
  *  @param int The value of the accumulator at it current state
  *  @return void The value of the accumulator after reduction.
  */
-typedef int (*List_Reduce_Fnc) (const void*, int);
+typedef void* (*List_Reduce_Fnc) (const void*, void*);
 /*
  *  @brief A function used to perform a copy of a value and return a pointer to the newly created data.
  *  @param void* The data to perform a copy on. This should not be altered
@@ -217,10 +217,10 @@ void* List_Shift(List_t*);
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
  *  @param list_reduce_fnc The function used to reduce each node.
- *  @param int The value to begin reduction with.
+ *  @param void* The value to begin reduction with.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulator);
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator);
 
 /*
  *  @brief Remove a given index from the list and destroy the data held within it.
@@ -241,8 +241,10 @@ List_Error_t List_Reverse(List_t* list_p);
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Sort(List_t* list_p);
+List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc);
 
 #endif

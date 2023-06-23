@@ -8,7 +8,7 @@ extern "C"
 int test_cmp_fnc(const void* a, const void* b)
 {
         if (NULL == a || NULL == b) return 0;
-        return (*(int*)b)-(*(int*)a);
+        return (*(int*)a)-(*(int*)b);
 }
 void test_free_fnc(void* a)
 {
@@ -34,9 +34,10 @@ void half_int(void* a)
     *(int*)a /= 2;
 }
 //test List_Reduce_Fnc
-int avg_reducer(const void* a, int acc)
+void* avg_reducer(const void* a, void* acc)
 {
-    return acc + *(int*)a;
+    *(int*)acc += *(int*)a;
+    return acc;
 }
 
 //test values for list population
@@ -52,13 +53,15 @@ int test_val3 = 63;
         EXPECT_NE(test_list1, nullptr); //all valid args
         List_t* test_list2 = List_Create(10, NULL, test_free_fnc);
         EXPECT_NE(test_list2, nullptr); //null cmp is allowed
+        List_t* test_list3 = List_Create(0, test_cmp_fnc, test_free_fnc);
+        EXPECT_NE(test_list3, nullptr); //null cmp is allowed
 
         List_Destroy(test_list1);
         List_Destroy(test_list2);
+        List_Destroy(test_list3);
     }
     //Test List create with improper args
     TEST(ListCreateTest, InvalidArgs) {
-        EXPECT_EQ(List_Create(0, test_cmp_fnc, test_free_fnc), nullptr); //must allow atleast a single node
         EXPECT_EQ(List_Create(10, test_cmp_fnc, NULL), nullptr); //null free not allowed
     }
 //}
@@ -653,7 +656,25 @@ int test_val3 = 63;
         EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
         EXPECT_EQ(List_Length(test_list), 3);
 
-        EXPECT_EQ(List_Sort(test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Sort(test_list, NULL), LIST_ERROR_SUCCESS);
+
+        EXPECT_EQ(List_Length(test_list), 3);
+        EXPECT_EQ(List_Pop(test_list), &test_val3);
+        EXPECT_EQ(List_Pop(test_list), &test_val2);
+        EXPECT_EQ(List_Pop(test_list), &test_val1);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListSortTest, ValidCustomArgs) {
+        List_t* test_list = List_Create(10, NULL, test_free_fnc);
+
+        EXPECT_EQ(List_Push(&test_val3, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val1, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Push(&test_val2, test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Length(test_list), 3);
+
+        EXPECT_EQ(List_Sort(test_list, test_cmp_fnc), LIST_ERROR_SUCCESS);
 
         EXPECT_EQ(List_Length(test_list), 3);
         EXPECT_EQ(List_Pop(test_list), &test_val3);
@@ -666,13 +687,13 @@ int test_val3 = 63;
     TEST(ListSortTest, ValidEmpty) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Sort(test_list), LIST_ERROR_SUCCESS);
+        EXPECT_EQ(List_Sort(test_list, NULL), LIST_ERROR_SUCCESS);
 
         List_Destroy(test_list);
     }
     //Test List sort with improper args
     TEST(ListSortTest, InvalidArgs) {
-        EXPECT_EQ(List_Sort(NULL), LIST_ERROR_INVALID_PARAM);
+        EXPECT_EQ(List_Sort(NULL, NULL), LIST_ERROR_INVALID_PARAM);
     }
 //}
 //List_For_Each

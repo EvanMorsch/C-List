@@ -96,7 +96,7 @@ static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	//make sure this wouldnt exceed length limits
-	if (list_p->length >= list_p->max_length)
+	if (list_p->max_length && list_p->length >= list_p->max_length)
 	{
 		return LIST_ERROR_EXCEED_LIMIT;
 	}
@@ -162,9 +162,11 @@ static void List_Node_Destroy(List_Node* node)
  *  @brief Check a list for sortedness. 
  *  @param List_t* A pointer to the list to check for sortedness.
 			A list is considered sorted when each node's precedence is ordered from high to low
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return bool True if sorted fully, false otherwise
  */
-static bool List_Is_Sorted(List_t* list_p)
+static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 {
 	//check params
 	if (NULL == list_p)
@@ -176,11 +178,25 @@ static bool List_Is_Sorted(List_t* list_p)
 	{
 		//compare current and next node
 		List_Node* current_node = List_Node_At(i, list_p);
-		if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
-		int node_cmp = list_p->cmp(
-			current_node,
-			current_node->next_p
-		);
+		if (NULL == current_node)
+		{
+			return LIST_ERROR_BAD_ENTRY;
+		}
+		int node_cmp = 0;
+		if (NULL == cmp_fnc && NULL != list_p->cmp)
+		{
+			node_cmp = list_p->cmp(
+				current_node->data_p,
+				current_node->next_p->data_p
+			);
+		}
+		else if (NULL != cmp_fnc)
+		{
+			node_cmp = cmp_fnc(
+				current_node->data_p,
+				current_node->next_p->data_p
+			);
+		}
 		if (0 > node_cmp)
 		{
 			return false;
@@ -253,6 +269,7 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p)
 /*
  *  @brief Create an empty list.
  *  @param size_t The maximum size to allow the list to grow.
+					If 0 is passed as this value, no maximum will be enforced (Not recommended!)
  *  @param List_Cmp_Fnc A function used when comparing data within the list for matches or sorting.
  *	   Passing NULL here will cause each member to have the same precedence.
  *  @param List_Free_Fnc A function used when freeing data within the list.
@@ -260,7 +277,7 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p)
  */
 List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free)
 {
-	if (max_length <= 0 || NULL == free)
+	if (NULL == free)
 	{
 		return NULL;
 	}
@@ -700,10 +717,10 @@ void* List_Shift(List_t* list_p)
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
  *  @param list_reduce_fnc The function used to reduce each node.
- *  @param int The value to begin reduction with.
+ *  @param void* The value to begin reduction with.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulator)
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator)
 {
 	//check params
 	if (NULL == list_p || NULL == reducer || NULL == accumulator)
@@ -717,7 +734,7 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, int* accumulat
 		//im not including contingency "else" on purpose
 		if (NULL != current_node)
 		{
-			*accumulator = reducer(current_node->data_p, *accumulator);
+			accumulator = reducer(current_node->data_p, accumulator);
 		}
 	}
 	return LIST_ERROR_SUCCESS;
@@ -856,33 +873,52 @@ List_Error_t List_Reverse(List_t* list_p)
  *  @brief Sort a given list using the set comparison function.
  *	   A list is considered sorted when precedence is in oredr from high to low
  *  @param List_t* The list to sort.
+ *  @param List_Cmp_Fnc An optional custom function pointer describing the precedence to use during sorting.
+						If NULL is used here, the list's default cmp function will be used
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Sort(List_t* list_p)
+List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 {
 	if (NULL == list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	while(!List_Is_Sorted(list_p))
+	while(!List_Is_Sorted(list_p, cmp_fnc))
 	{
 		//loop through every node until the second to last one
 		for(size_t i = 0; i < list_p->length-1; i++)
 		{
 			//compare current and next node
 			List_Node* current_node = List_Node_At(i, list_p);
-			if (NULL == current_node) return LIST_ERROR_BAD_ENTRY;
-			int node_cmp = list_p->cmp(
-				current_node,
-				current_node->next_p
-			);
+			if (NULL == current_node)
+			{
+				return LIST_ERROR_BAD_ENTRY;
+			}
+			int node_cmp = 0;
+			if (NULL == cmp_fnc && NULL != list_p->cmp)
+			{
+				node_cmp = list_p->cmp(
+					current_node->data_p,
+					current_node->next_p->data_p
+				);
+			}
+			else if (NULL != cmp_fnc)
+			{
+				node_cmp = cmp_fnc(
+					current_node->data_p,
+					current_node->next_p->data_p
+				);
+			}
 			if (0 > node_cmp)
 			{
 				List_Error_t could_swap = List_Node_Swap(
 					List_Node_At(i, list_p),
 					List_Node_At(i+1, list_p)
 				);
-				if (LIST_ERROR_SUCCESS != could_swap) return could_swap;
+				if (LIST_ERROR_SUCCESS != could_swap)
+				{
+					return could_swap;
+				}
 			}
 		}
 	}
