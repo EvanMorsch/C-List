@@ -37,7 +37,7 @@ List_t;
  *  @param void* The data to hold within the node.
  *  @return List_Node* A pointer to the allocated node or NULL on error.
  */
-static List_Node* List_Node_Create(void* data_p)
+static List_Node* List_Node_Create(void* data_p) //N/A
 {
 	if (NULL == data_p)
 	{
@@ -59,15 +59,13 @@ static List_Node* List_Node_Create(void* data_p)
  *  @param List_t* A pointer to the list that contains the node in question.
  *  @return List_Node* A pointer to the node at the given index or NULL on error.
  */
-static List_Node* List_Node_At(size_t at, List_t* list_p) //safe
+static List_Node* List_Node_At(size_t at, List_t* list_p) //N/A
 {
 	//check params
 	if (NULL == list_p || at >= list_p->length)
 	{
 		return NULL;
 	}
-
-	pthread_mutex_lock(&(list_p->lock));
 
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
@@ -86,8 +84,6 @@ static List_Node* List_Node_At(size_t at, List_t* list_p) //safe
 		}
 	}
 
-	pthread_mutex_unlock(&(list_p->lock));
-
 	//return the node or NULL if an issue arose
 	return current_node;
 }
@@ -98,18 +94,27 @@ static List_Node* List_Node_At(size_t at, List_t* list_p) //safe
  *  @param List_t* A pointer to the list that the node should belong in.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_p) //not safe
+static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_p) //N/A
 {
 	//param check
-	if (NULL == node_p || NULL == list_p || at > list_p->length)
+	if (NULL == node_p || NULL == list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
+	}
+
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	if (at > list_p->length)
+	{
+		ret_val = LIST_ERROR_INVALID_PARAM;
+		goto exit;
 	}
 
 	//make sure this wouldnt exceed length limits
 	if (list_p->max_length && list_p->length >= list_p->max_length)
 	{
-		return LIST_ERROR_EXCEED_LIMIT;
+		ret_val = LIST_ERROR_EXCEED_LIMIT;
+		goto exit;
 	}
 	if (0 != list_p->length)
 	{
@@ -152,7 +157,9 @@ static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_
 	}
 	//inc len
 	list_p->length++;
-	return LIST_ERROR_SUCCESS;
+
+exit:
+	return ret_val;
 }
 
 /*
@@ -160,7 +167,7 @@ static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_
  *  @param List_Node* A pointer to the node to destroy.
  *  @return Void
  */
-static void List_Node_Destroy(List_Node* node)
+static void List_Node_Destroy(List_Node* node) //N/A
 {
 	//check params
 	if (NULL != node)
@@ -177,7 +184,7 @@ static void List_Node_Destroy(List_Node* node)
 						If NULL is used here, the list's default cmp function will be used
  *  @return bool True if sorted fully, false otherwise
  */
-static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc) //not safe
+static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc) //N/A
 {
 	//check params
 	if (NULL == list_p)
@@ -223,7 +230,7 @@ static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc) //not safe
  *  @param List_Node* A pointer to the second node to swap.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b)
+static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b) //N/A
 {
 	//check params
 	if (NULL == node_a || NULL == node_b)
@@ -249,15 +256,13 @@ static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b)
  *  @param List_t* A pointer to the list that contains the node in question.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p) //safe
+static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p) //N/A
 {
 	//check params
 	if (NULL == list_p || NULL == node)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-
-	pthread_mutex_lock(&(list_p->lock));
 
 	//update neighbors
 	List_Node* before_node = node->previous_p;
@@ -278,8 +283,6 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p) //safe
 		list_p->head_p = after_node;
 	}
 
-	pthread_mutex_unlock(&(list_p->lock));
-
 	List_Node_Destroy(node);
 	return LIST_ERROR_SUCCESS;
 }
@@ -293,7 +296,7 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p) //safe
  *  @param List_Free_Fnc A function used when freeing data within the list.
  *  @return List_t* A pointer to the allocated list or NULL on error.
  */
-List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free)
+List_t* List_Create(size_t max_length, List_Cmp_Fnc cmp, List_Free_Fnc free) //N/A
 {
 	if (NULL == free)
 	{
@@ -416,19 +419,23 @@ exit:
  *  @param List_t* The list that contains the node in question.
  *  @return void* The data held within the node at the given location or NULL on error.
  */
-void* List_At(size_t at, List_t* list_p)
+void* List_At(size_t at, List_t* list_p) //safe
 {
 	//check params
-	if (NULL == list_p || at >= list_p->length)
+	if (NULL == list_p)
 	{
 		return NULL;
 	}
 
+	pthread_mutex_lock(&(list_p->lock));
 	List_Node* node_at_p = List_Node_At(at, list_p);
+	pthread_mutex_unlock(&(list_p->lock));
+
 	if (NULL == node_at_p)
 	{
 		return NULL;
 	}
+
 	return node_at_p->data_p;
 }
 
@@ -438,7 +445,7 @@ void* List_At(size_t at, List_t* list_p)
  *  @param List_t* The list that should contain the given node.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Push(void* data_p, List_t* list_p)
+List_Error_t List_Push(void* data_p, List_t* list_p) //safe
 {
 	//check param
 	if (NULL == list_p || NULL == data_p)
@@ -453,7 +460,12 @@ List_Error_t List_Push(void* data_p, List_t* list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	return List_Node_Insert(new_node_p, list_p->length, list_p);
+
+	pthread_mutex_lock(&(list_p->lock));
+	List_Error_t ret_val = List_Node_Insert(new_node_p, list_p->length, list_p);
+	pthread_mutex_unlock(&(list_p->lock));
+
+	return ret_val;
 }
 
 /*
@@ -462,7 +474,7 @@ List_Error_t List_Push(void* data_p, List_t* list_p)
  *  @param List_t* The list that should contain the given node.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Unshift(void* data_p, List_t* list_p)
+List_Error_t List_Unshift(void* data_p, List_t* list_p) //safe
 {
 	//check param
 	if (NULL == list_p || NULL == data_p)
@@ -477,7 +489,12 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	return List_Node_Insert(new_node_p, 0, list_p);
+
+	pthread_mutex_lock(&(list_p->lock));
+	List_Error_t ret_val = List_Node_Insert(new_node_p, 0, list_p);
+	pthread_mutex_unlock(&(list_p->lock));
+
+	return ret_val;
 }
 
 /*
@@ -487,7 +504,7 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p)
  *  @param List_t* The list that should contain the given node.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
+List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p) //safe
 {
 	//check param
 	if (NULL == list_p || NULL == data_p)
@@ -503,7 +520,12 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p)
 		return LIST_ERROR_BAD_ENTRY;
 	}
 	//at is checked in insert node
-	return List_Node_Insert(new_node_p, at, list_p);
+
+	pthread_mutex_lock(&(list_p->lock));
+	List_Error_t ret_val = List_Node_Insert(new_node_p, at, list_p);
+	pthread_mutex_unlock(&(list_p->lock));
+
+	return ret_val;
 }
 
 /*
