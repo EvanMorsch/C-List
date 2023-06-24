@@ -191,16 +191,12 @@ static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc) //N/A
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-
-	//loop through every node until the second to last one
-	for(size_t i = 0; i < list_p->length-1; i++) //change this from index to pointer!!!!!!!
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the second to last
+	for (size_t i = 0; i < list_p->length-1 && NULL != current_node; i++)
 	{
 		//compare current and next node
-		List_Node* current_node = List_Node_At(i, list_p);
-		if (NULL == current_node)
-		{
-			return LIST_ERROR_BAD_ENTRY;
-		}
 		int node_cmp = 0;
 		if (NULL == cmp_fnc && NULL != list_p->cmp)
 		{
@@ -220,6 +216,8 @@ static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc) //N/A
 		{
 			return false;
 		}
+
+		current_node = current_node->next_p;
 	}
 	return true;
 }
@@ -346,7 +344,10 @@ List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node_fnc) //safe
 		goto exit;
 	}
 	
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		List_Error_t could_push;
 		if (NULL == copy_node_fnc)
@@ -364,6 +365,8 @@ List_t* List_Copy(List_t* list_p, List_Copy_Fnc copy_node_fnc) //safe
 			copy_list = NULL;
 			goto exit;
 		}
+
+		current_node = current_node->next_p;
 	}
 
 exit:
@@ -390,9 +393,10 @@ List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check) //safe
 
 	pthread_mutex_lock(&(list_p->lock));
 	
-	//keep count of nodes to verify size
-	size_t actual_length = 0;
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//user validity check
 		if (NULL != valid_check && !valid_check(current_node->data_p))
@@ -400,7 +404,7 @@ List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check) //safe
 			ret_val = LIST_ERROR_BAD_ENTRY;
 			goto exit;
 		}
-		actual_length++;
+		current_node = current_node->next_p;
 	}
 
 	if (actual_length != list_p->length || actual_length > list_p->max_length)
@@ -452,20 +456,7 @@ List_Error_t List_Push(void* data_p, List_t* list_p) //safe
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-
-	//try to allocate the node
-	List_Node* new_node_p = List_Node_Create(data_p);
-	//make sure it was allocated properly
-	if (NULL == new_node_p)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-
-	pthread_mutex_lock(&(list_p->lock));
-	List_Error_t ret_val = List_Node_Insert(new_node_p, list_p->length, list_p);
-	pthread_mutex_unlock(&(list_p->lock));
-
-	return ret_val;
+	return List_Insert(data_p, list_p->length, list_p); //safe call
 }
 
 /*
@@ -481,20 +472,7 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p) //safe
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-
-	//try to allocate the node
-	List_Node* new_node_p = List_Node_Create(data_p);
-	//make sure it was allocated properly
-	if (NULL == new_node_p)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-
-	pthread_mutex_lock(&(list_p->lock));
-	List_Error_t ret_val = List_Node_Insert(new_node_p, 0, list_p);
-	pthread_mutex_unlock(&(list_p->lock));
-
-	return ret_val;
+	return List_Insert(data_p, 0, list_p); //safe call
 }
 
 /*
@@ -550,8 +528,8 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
-	//loop till the end
-	for (size_t i = 0; i < list_p->length; i++)
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -599,9 +577,10 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 	{
 		return false;
 	}
-
-	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -618,6 +597,7 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 			//we have hit a dead end
 			return false;
 		}
+		current_node = current_node->next_p;
 	}
 	//we didnt find a match
 	return false;
@@ -637,9 +617,10 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 	{
 		return false;
 	}
-
-	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
@@ -652,6 +633,7 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 				return false;
 			}
 		}
+		current_node = current_node->next_p;
 	}
 	//we didnt find a failure!
 	return true;
@@ -670,9 +652,10 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-
-	//loop till the end
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -683,6 +666,7 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 		{
 			return LIST_ERROR_BAD_ENTRY;
 		}
+		current_node = current_node->next_p;
 	}
 	return LIST_ERROR_SUCCESS;
 }
@@ -806,7 +790,10 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumula
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	
-	for (List_Node* current_node = list_p->head_p; current_node != NULL; current_node = current_node->next_p)
+	//get the head node, an empty list will give NULL
+	List_Node* current_node = list_p->head_p;
+	//loop till we are at the end
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		//im not including contingency "else" on purpose
@@ -814,6 +801,7 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumula
 		{
 			accumulator = reducer(current_node->data_p, accumulator);
 		}
+		current_node = current_node->next_p;
 	}
 	return LIST_ERROR_SUCCESS;
 }
@@ -836,8 +824,8 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 	}
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
-	//loop till the end
-	for (size_t i = 0; i < list_p->length; i++)
+	//loop till the end (have to use index here)
+	for (size_t i = 0; i < list_p->length && NULL != current_node; i++)
 	{
 		//make sure the node is valid
 		if (NULL != current_node)
@@ -848,14 +836,11 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 			List_Node* next_node = current_node->next_p;
 			if (!do_result)
 			{
-				//remove node and free its data
-				if (NULL != list_p->free)
-				{
-					list_p->free(current_node->data_p);
-				}
-				List_Node_Remove(current_node, list_p);
+				//delete node and free its data
+				List_Delete_At(i, list_p);
+				i--;
 			}
-			//get next node
+			//use next node
 			current_node = next_node;
 		}
 		else
@@ -934,16 +919,18 @@ List_Error_t List_Reverse(List_t* list_p)
 		return LIST_ERROR_INVALID_PARAM;
 	}
 	size_t midpoint = list_p->length / 2;
+	List_Node* front_node = list_p->head_p;
+	List_Node* rear_node = List_Node_At(list_p->length-1, list_p);
 	for(size_t i = 0; i < midpoint; i++)
 	{
-		List_Error_t could_swap = List_Node_Swap(
-			List_Node_At(i, list_p),
-			List_Node_At(list_p->length - (i + 1), list_p)
-		);
+		List_Error_t could_swap = List_Node_Swap(front_node, rear_node);
 		if (LIST_ERROR_SUCCESS != could_swap)
 		{
 			return could_swap;
 		}
+
+		front_node = front_node->next_p;
+		rear_node = rear_node->previous_p;
 	}
 	return LIST_ERROR_SUCCESS;
 }
