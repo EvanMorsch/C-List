@@ -407,11 +407,6 @@ List_Error_t List_Verify(List_t* list_p, List_Find_Fnc valid_check) //safe
 		current_node = current_node->next_p;
 	}
 
-	if (actual_length != list_p->length || actual_length > list_p->max_length)
-	{
-		ret_val = LIST_ERROR_EXCEED_LIMIT;
-	}
-
 exit:
 	pthread_mutex_unlock(&(list_p->lock));
 	return ret_val;
