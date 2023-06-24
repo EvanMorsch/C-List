@@ -100,7 +100,7 @@ static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_
 	{
 		return LIST_ERROR_EXCEED_LIMIT;
 	}
-	if (0 != list_p->length)
+	if (0 != list_p->length) //no need to update any other nodes
 	{
 		//find whos at "at" or the end if appending
 		if (list_p->length == at)
