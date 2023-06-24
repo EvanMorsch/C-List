@@ -405,14 +405,7 @@ List_Error_t List_Push(void* data_p, List_t* list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	//try to allocate the node
-	List_Node* new_node_p = List_Node_Create(data_p);
-	//make sure it was allocated properly
-	if (NULL == new_node_p)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-	return List_Node_Insert(new_node_p, list_p->length, list_p);
+	return List_Insert(data_p, list_p->length, list_p);
 }
 
 /*
@@ -428,14 +421,7 @@ List_Error_t List_Unshift(void* data_p, List_t* list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
-	//try to allocate the node
-	List_Node* new_node_p = List_Node_Create(data_p);
-	//make sure it was allocated properly
-	if (NULL == new_node_p)
-	{
-		return LIST_ERROR_INVALID_PARAM;
-	}
-	return List_Node_Insert(new_node_p, 0, list_p);
+	return List_Insert(data_p, 0, list_p);
 }
 
 /*
