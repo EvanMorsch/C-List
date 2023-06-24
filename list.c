@@ -774,14 +774,11 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 			List_Node* next_node = current_node->next_p;
 			if (!do_result)
 			{
-				//remove node and free its data
-				if (NULL != list_p->free)
-				{
-					list_p->free(current_node->data_p);
-				}
-				List_Node_Remove(current_node, list_p);
+				//delete node and free its data
+				List_Delete_At(i, list_p);
+				i--;
 			}
-			//get next node
+			//use next node
 			current_node = next_node;
 		}
 		else
