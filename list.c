@@ -704,19 +704,23 @@ exit:
  *  @param List_t* The list to remove the given index from.
  *  @return void* The data held within the removed node or NULL on error.
  */
-void* List_Remove_At(size_t at, List_t* list_p)
+void* List_Remove_At(size_t at, List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p || at > list_p->length)
 	{
 		return NULL;
 	}
+	void* ret_val = NULL;
+
+	pthread_mutex_lock(&(list_p->lock));
 
 	//find the node
 	List_Node* node = List_Node_At(at, list_p);
 	if (NULL == node)
 	{
-		return NULL;
+		ret_val = NULL;
+		goto exit;
 	}
 	//save the nodes data
 	void* node_data = node->data_p;
@@ -724,10 +728,15 @@ void* List_Remove_At(size_t at, List_t* list_p)
 	List_Error_t removed_node = List_Node_Remove(node, list_p);
 	if (LIST_ERROR_SUCCESS != removed_node)
 	{
-		return NULL;
+		ret_val = NULL;
+		goto exit;
 	}
+	ret_val = node_data;
+
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
 	//return data
-	return node_data;
+	return ret_val;
 }
 
 /*
@@ -736,7 +745,7 @@ void* List_Remove_At(size_t at, List_t* list_p)
  *  @param List_t* The list to delete the given index from.
  *  @return void.
  */
-void List_Delete_At(size_t at, List_t* list_p)
+void List_Delete_At(size_t at, List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p || at > list_p->length)
@@ -745,7 +754,8 @@ void List_Delete_At(size_t at, List_t* list_p)
 	}
 
 	//find the node and delete it
-	void* removing_node_data = List_Remove_At(at, list_p);
+	void* removing_node_data = List_Remove_At(at, list_p); //safe call
+	//i dont see how anyone else could have a handle on removing_node_data by this point
 	if (NULL != removing_node_data)
 	{
 		//we should be on the correct node data, free it
@@ -761,7 +771,7 @@ void List_Delete_At(size_t at, List_t* list_p)
  *  @param List_t* The list to remove the last node from.
  *  @return void* The data held within the removed node or NULL on error.
  */
-void* List_Pop(List_t* list_p)
+void* List_Pop(List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p)
@@ -770,11 +780,8 @@ void* List_Pop(List_t* list_p)
 	}
 
 	//get the head node, an empty list will give NULL
-	void* removing_node_data = List_Remove_At(list_p->length-1, list_p);
-	if (NULL == removing_node_data)
-	{
-		return NULL;
-	}
+	void* removing_node_data = List_Remove_At(list_p->length-1, list_p); //safe call
+
 	//we should be on the correct node data, return it
 	return removing_node_data;
 }
@@ -784,7 +791,7 @@ void* List_Pop(List_t* list_p)
  *  @param List_t* The list to remove the first node from.
  *  @return void* The data held within the removed node or NULL on error.
  */
-void* List_Shift(List_t* list_p)
+void* List_Shift(List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p)
@@ -793,11 +800,8 @@ void* List_Shift(List_t* list_p)
 	}
 
 	//get the head node, an empty list will give NULL
-	void* removing_node_data = List_Remove_At(0, list_p);
-	if (NULL == removing_node_data)
-	{
-		return NULL;
-	}
+	void* removing_node_data = List_Remove_At(0, list_p); //safe call
+
 	//we should be on the correct node data, return it
 	return removing_node_data;
 }
