@@ -813,13 +813,15 @@ void* List_Shift(List_t* list_p) //safe
  *  @param void* The value to begin reduction with.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator)
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == reducer || NULL == accumulator)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+
+	pthread_mutex_lock(&(list_p->lock));
 	
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
@@ -834,6 +836,9 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumula
 		}
 		current_node = current_node->next_p;
 	}
+
+	pthread_mutex_unlock(&(list_p->lock));
+
 	return LIST_ERROR_SUCCESS;
 }
 
@@ -846,13 +851,17 @@ List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumula
  *	   A test is failed and filtered out if false is returned.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
+List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == do_fnc)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	pthread_mutex_lock(&(list_p->lock));
+
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
 	//loop till the end (have to use index here)
@@ -868,7 +877,9 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 			if (!do_result)
 			{
 				//delete node and free its data
-				List_Delete_At(i, list_p);
+				pthread_mutex_unlock(&(list_p->lock)); //just a cheat, i dont really like this
+				List_Delete_At(i, list_p); //safe call
+				pthread_mutex_lock(&(list_p->lock));
 				i--;
 			}
 			//use next node
@@ -877,11 +888,14 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
 		else
 		{
 			//we have hit a dead end
-			return LIST_ERROR_BAD_ENTRY;
+			ret_val = LIST_ERROR_BAD_ENTRY;
+			goto exit;
 		}
 	}
 	//we didnt find a match
-	return LIST_ERROR_SUCCESS;
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
@@ -889,7 +903,7 @@ List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc)
  *  @param List_t* The list to destroy nodes within.
  *  @return void.
  */
-void List_Purge(List_t* list_p)
+void List_Purge(List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p)
@@ -897,9 +911,9 @@ void List_Purge(List_t* list_p)
 		return;
 	}
 	//delete all list members until length is 0
-	while (List_Length(list_p))
+	while (list_p->length)
 	{
-		List_Delete_At(0, list_p);
+		List_Delete_At(0, list_p); //safe call
 	}
 	return;
 }
@@ -909,14 +923,14 @@ void List_Purge(List_t* list_p)
  *  @param List_t* The list to destroy.
  *  @return void.
  */
-void List_Destroy(List_t* list_p)
+void List_Destroy(List_t* list_p) //safe
 {
 	//check params
 	if (NULL == list_p)
 	{
 		return;
 	}
-	List_Purge(list_p);
+	List_Purge(list_p); //safe call
 	//all has been freed
 	pthread_mutex_destroy(&(list_p->lock));
 	free(list_p);//setting to null here does nothing
@@ -929,7 +943,7 @@ void List_Destroy(List_t* list_p)
  *  @return size_t the length of the list
  * 	   Not ethat 0 will be returned if the list does not exist.
  */
-size_t List_Length(List_t* list_p)
+size_t List_Length(List_t* list_p) //safe
 {
 	if (NULL != list_p)
 	{
@@ -949,6 +963,10 @@ List_Error_t List_Reverse(List_t* list_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	pthread_mutex_lock(&(list_p->lock));
+
 	size_t midpoint = list_p->length / 2;
 	List_Node* front_node = list_p->head_p;
 	List_Node* rear_node = List_Node_At(list_p->length-1, list_p);
@@ -957,13 +975,17 @@ List_Error_t List_Reverse(List_t* list_p)
 		List_Error_t could_swap = List_Node_Swap(front_node, rear_node);
 		if (LIST_ERROR_SUCCESS != could_swap)
 		{
-			return could_swap;
+			ret_val = could_swap;
+			goto exit;
 		}
 
 		front_node = front_node->next_p;
 		rear_node = rear_node->previous_p;
 	}
-	return LIST_ERROR_SUCCESS;
+
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
@@ -980,6 +1002,9 @@ List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	pthread_mutex_lock(&(list_p->lock));
 	while(!List_Is_Sorted(list_p, cmp_fnc))
 	{
 		//loop through every node until the second to last one
@@ -989,7 +1014,8 @@ List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 			List_Node* current_node = List_Node_At(i, list_p);
 			if (NULL == current_node)
 			{
-				return LIST_ERROR_BAD_ENTRY;
+				ret_val = LIST_ERROR_BAD_ENTRY;
+				goto exit;
 			}
 			int node_cmp = 0;
 			if (NULL == cmp_fnc && NULL != list_p->cmp)
@@ -1014,10 +1040,14 @@ List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc)
 				);
 				if (LIST_ERROR_SUCCESS != could_swap)
 				{
-					return could_swap;
+					ret_val = could_swap;
+					goto exit;
 				}
 			}
 		}
 	}
-	return LIST_ERROR_SUCCESS;
+
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
