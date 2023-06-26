@@ -513,13 +513,16 @@ List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p) //safe
  *  @return List_Error_t LIST_ERROR_SUCCESS on successful find, LIST_ERROR_EXCEED_LIMIT if not found in list,
  						or any error that may occur.
  */
-List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
+List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == search_data_p)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	pthread_mutex_lock(&(list_p->lock));
 
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
@@ -543,7 +546,7 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 					*response = i;
 				}
 				//return success code
-				return LIST_ERROR_SUCCESS;
+				goto exit;
 			}
 			//otherwise, just try the next node
 			current_node = current_node->next_p;
@@ -551,11 +554,16 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 		else
 		{
 			//we have hit a dead end
-			return LIST_ERROR_BAD_ENTRY;
+			ret_val = LIST_ERROR_BAD_ENTRY;
+			goto exit;
 		}
 	}
+
 	//return success code
-	return LIST_ERROR_EXCEED_LIMIT;
+	ret_val = LIST_ERROR_EXCEED_LIMIT;
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
@@ -565,13 +573,17 @@ List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response)
 	   A test is passed when this function returns true after being given data.
  *  @return bool True if an entry is found that passes the given test or false if no nodes pass or an error occurs.
  */
-bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
+bool List_Some(List_t* list_p, List_Find_Fnc do_fnc) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == do_fnc)
 	{
 		return false;
 	}
+	bool ret_val = false;
+
+	pthread_mutex_lock(&(list_p->lock));
+
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
 	//loop till we are at the end
@@ -584,18 +596,22 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 			bool node_found = do_fnc(current_node->data_p);
 			if (node_found)
 			{
-				return true;
+				ret_val = true;
+				goto exit;
 			}
 		}
 		else
 		{
 			//we have hit a dead end
-			return false;
+			goto exit;
 		}
 		current_node = current_node->next_p;
 	}
+
 	//we didnt find a match
-	return false;
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
@@ -605,13 +621,17 @@ bool List_Some(List_t* list_p, List_Find_Fnc do_fnc)
 	   A test is passed when this function returns true after being given data and failed if false is returned.
  *  @return bool True if all entries pass th egiven test or false when one fails or an error occurs.
  */
-bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
+bool List_Every(List_t* list_p, List_Find_Fnc do_fnc) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == do_fnc)
 	{
 		return false;
 	}
+	bool ret_val = true;
+
+	pthread_mutex_lock(&(list_p->lock));
+
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
 	//loop till we are at the end
@@ -625,13 +645,17 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
 			bool node_failed = do_fnc(current_node->data_p);
 			if (!node_failed)
 			{
-				return false;
+				ret_val = false;
+				goto exit;
 			}
 		}
 		current_node = current_node->next_p;
 	}
+
 	//we didnt find a failure!
-	return true;
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
@@ -640,13 +664,17 @@ bool List_Every(List_t* list_p, List_Find_Fnc do_fnc)
  *  @param List_Do_Fnc The function to run with each entry.
  *  @return List_Error_t LIST_ERROR_SUCCESS on success or any error that may occur.
  */
-List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
+List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc) //safe
 {
 	//check params
 	if (NULL == list_p || NULL == do_fnc)
 	{
 		return LIST_ERROR_INVALID_PARAM;
 	}
+	List_Error_t ret_val = LIST_ERROR_SUCCESS;
+
+	pthread_mutex_lock(&(list_p->lock));
+
 	//get the head node, an empty list will give NULL
 	List_Node* current_node = list_p->head_p;
 	//loop till we are at the end
@@ -659,11 +687,15 @@ List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc)
 		}
 		else
 		{
-			return LIST_ERROR_BAD_ENTRY;
+			ret_val = LIST_ERROR_BAD_ENTRY;
+			goto exit;
 		}
 		current_node = current_node->next_p;
 	}
-	return LIST_ERROR_SUCCESS;
+
+exit:
+	pthread_mutex_unlock(&(list_p->lock));
+	return ret_val;
 }
 
 /*
