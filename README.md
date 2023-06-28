@@ -129,7 +129,7 @@ void* List_At(size_t at, List_t* list_p);
 ### List_Push
 ```C
 /*
- *  @brief                  - Place data into the last index of a given list, making it the last item in the list.
+ *  @brief                  - Place data at the end of a given list.
  *  @param void*            - The data to insert into the list.
  *  @param List_t*          - The list being inserted into.
  *  @return List_Error_t    - LIST_ERROR_SUCCESS on success or any error that may occur.
@@ -139,10 +139,63 @@ List_Error_t List_Push(void* data_p, List_t* list_p);
 <br/>
 <br/>
 
-
-
+### List_Unshift
+```C
+/*
+ *  @brief                  - Place data at the first index of a given list.
+ *  @param void*            - The data to insert into the list.
+ *  @param List_t*          - The list being inserted into.
+ *  @return List_Error_t    - LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Unshift(void* data_p, List_t* list_p);
+```
 <br/>
 <br/>
 
+### List_Insert
+```C
+/*
+ *  @brief                  - Put data into the given index of a given list.
+ *  @param void*            - The data to insert to the list.
+ *  @param size_t           - The index to insert the given data into.
+ *  @param List_t*          - The list being inserted into.
+ *  @return List_Error_t    - LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Insert(void* data_p, size_t at, List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Find
+```C
+/*
+ *  @brief                  - Find the first instance of a given search data using the defined compare function.
+ *  @param void*            - The data to use as a 'search term'.
+ *  @param List_t*          - The list that should contain the given search term.
+ 		                    The function uses the list's cmp function to decide if a node is "equal" to the search term.
+		                    If the cmp function is not defined, the function will assume that all nodes are the same,
+		 	                    therefore returning the first node it 'sees'.
+ *  @param size_t*          - A pointer in which to put the index if any should be found.
+	                        Note that this will not be changed if no match is found.
+ *  @return List_Error_t    - LIST_ERROR_SUCCESS on successful find, LIST_ERROR_EXCEED_LIMIT if not found in list,
+ 						        or any error that may occur.
+ */
+List_Error_t List_Find(void* search_data_p, List_t* list_p, size_t* response);
+```
+<br/>
+<br/>
+
+#### Notes
+So I really wasn't sure how i wanted to do this function and was hoping it would just hit me at some point...
+The problem i had was that, on failure to find an item, i wasnt sure what return value I personally would expect.
+On one hand, i would expect a NULL, Undefined, or -1. Seeing as, what i was is a size_t representing the index, none
+of these are really a good option. My second idea, and what i went with for now, was to 'return' by assigning a parameter's value. This ends up feeling unnatural to type and is kinda annoying, but ill keep it for now and see how it feels over time.
+
+The second issue, and one that I already have planned out, is that, I'd like to include the ability to pass a cmp function as a parameter for this and some other functions that use the cmp function (like sort). I see some overlap in forcing its use for more than one thing and may get annoying to update just for one function at a time.
+<br/>
+<br/>
+
+<br/>
+<br/>
 ## Static functions
 You really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
