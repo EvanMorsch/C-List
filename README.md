@@ -218,6 +218,53 @@ I tend to go overboard with error checking but i would ideally like this (and si
  */
 bool List_Every(List_t* list_p, List_Find_Fnc do_fnc);
 ```
+<br/>
+<br/>
+
+### List_For_Each
+```C
+/*
+ *  @brief 					Perform a given function passing all data entries within a list,
+ 								one at a time, to the function.
+ *  @param List_t* 			The list to test entries within.
+ *  @param List_Do_Fnc 		The function to perform using each entry as a parameter, one at a time.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_For_Each(List_t* list_p, List_Do_Fnc do_fnc);
+```
+<br/>
+<br/>
+
+### List_Remove_At
+```C
+/*
+ *  @brief 			Remove a given index from the list.
+					Note that this WILL NOT free the data.
+ *  @param size_t 	The index of the data to remove from the list.
+ *  @param List_t* 	The list to remove the given index from.
+ *  @return void* 	The data held within the removed node or NULL on error.
+ */
+void* List_Remove_At(size_t at, List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Delete_At
+```C
+/*
+ *  @brief 			Delete a given index from the list.
+					Note that this will free the data being removed using the free function assigned to the list upon creation
+ *  @param size_t 	The index to delete from the list.
+ *  @param List_t* 	The list to delete the given index from.
+ *  @return void.
+ */
+void List_Delete_At(size_t at, List_t* list_p);
+```
+#### Notes
+I tend to make functions that are made to free memory return nothing. That being said, I can see use in detecting failures here. Say for example, an index is to be deleted that is out of bounds or otherwise fails to be deleted... A lack of return value can lead to ambiguity as to the list's current size after supposed deletion.
+I may change this.
+<br/>
+<br/>
 
 
 <br/>
