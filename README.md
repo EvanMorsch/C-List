@@ -62,6 +62,11 @@ struct List_Node
 <br/>
 <br/>
 
+## User-defined functions
+
+<br/>
+<br/>
+
 ## Functions
 ### List_Create
 ```C
@@ -266,6 +271,82 @@ I may change this.
 <br/>
 <br/>
 
+### List_Pop
+```C
+/*
+ *  @brief 			Remove the last node from the list.
+					Not that this will not free the data upon removal.
+ *  @param List_t* 	The list to remove the last node from.
+ *  @return void* 	The data held within the removed node or NULL on error.
+ */
+void* List_Pop(List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Shift
+```C
+/*
+ *  @brief 			Remove the first node from the list.
+ *  @param List_t* 	The list to remove the first node from.
+ *  @return void* 	The data held within the removed node or NULL on error.
+ */
+void* List_Shift(List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Reduce
+```C
+/*
+ *  @brief 					Remove the first node from the list.
+ *  @param List_t* 			The list to reduce.
+ *  @param list_reduce_fnc 	The function used to reduce each node.
+ * 							This function will be called on each data entry in the list, and assign 
+ * 								the accumulator to the return value after each call.
+ * 							See list_reduce_fnc for more detail
+ *  @param void* 			The value to begin reduction with.
+ * 							Thsi value will be overwritten with the accumulation.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reduce(List_t* list_p, List_Reduce_Fnc reducer, void* accumulator);
+```
+<br/>
+<br/>
+
+### List_Filter
+```C
+/*
+ *  @brief 					Test each node in a list using a given find function, removing 
+ *								each that fail the given find function.
+ *	   						Note that filtered entries will be deleted and thus, freed using the 
+ * 								assigned free_fnc.
+ *  @param List_t* 			The list to filter entries from.
+ *  @param List_Find_Fnc 	The function to test each entry using.
+ *	   							A test is passed and the data, allowed to stay when this function returns true.
+ *	   							A test is failed and deleted if false is returned.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Filter(List_t* list_p, List_Find_Fnc do_fnc);
+```
+#### Notes
+The decision to delete was because it ususally becomes difficult to keep a handle on data after mass removal.
+You COULD get around it by reassigning the free_fnc to do nothing, then copy the list before filtering or something, then reassigning the free_fnc to normal afterward.
+<br/>
+<br/>
+
+### List_Purge
+```C
+/*
+ *  @brief 			Delete all data in the given list.
+ *  @param List_t* 	The list to destroy all data within.
+ *  @return void.
+ */
+void List_Purge(List_t* list_p);
+```
+<br/>
+<br/>
+
 
 <br/>
 <br/>
@@ -273,3 +354,8 @@ I may change this.
 
 ## Static functions
 You really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
+
+## Notes
+- Removal will NOT free data (As far as the user is concerned), Deletion will
+- NULL data is not allowed because it messes up error checking, you can, however, use a pointer to NULL data
+
