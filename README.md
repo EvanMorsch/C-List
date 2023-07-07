@@ -347,6 +347,68 @@ void List_Purge(List_t* list_p);
 <br/>
 <br/>
 
+### List_Destroy
+```C
+/*
+ *  @brief 			Purge and destroy the given list.
+ *  @param List_t* 	The list to purge and destroy.
+ *  @return void.
+ */
+void List_Destroy(List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Length
+```C
+/*
+ *  @brief 			Get the current length of a given list.
+ *  @param List_t* 	The list to get the length of.
+ *  @return size_t 	The length of the list.
+ * 	   				Note that 0 will be returned if the list does not exist.
+ */
+size_t List_Length(List_t* list_p);
+```
+#### Notes
+I dont like ssize_t, it clips the top end of size_t just for what is usually one negative number.
+Instead, i just made 0 the "error" code. Seeing as a list that does not exist, has no size, i think 0 is reasonable. 
+Not to mention, i made plenty of ways to check validity instead, just use them.
+<br/>
+<br/>
+
+### List_Reverse
+```C
+/*
+ *  @brief 					Reverse a given list in comparison to its current order.
+ *  @param List_t* 			The list to reverse.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Reverse(List_t* list_p);
+```
+<br/>
+<br/>
+
+
+### List_Sort
+```C
+/*
+ *  @brief 					Sort a given list using the assigned comparison function or a function passed in
+ *								as a parameter.
+ *	   						Note that a list is considered sorted when all data's precedence is in order from 
+ * 								highest to lowest.
+ *  @param List_t* 			The list to sort.
+ *  @param List_Cmp_Fnc 	An optional custom function pointer describing the cmp_fnc to use during sorting.
+ *							If NULL is used here, the list's default cmp_fnc will be used.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc);
+```
+#### Notes
+Okay the algorithm i used was really lazy and inefficient, i have a merge-sort implementation planned for later.
+Its better because its stable and much more efficient.
+<br/>
+<br/>
+
 
 <br/>
 <br/>
