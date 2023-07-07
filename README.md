@@ -415,7 +415,104 @@ Its better because its stable and much more efficient.
 <br/>
 
 ## Static functions
-You really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
+Users really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
+
+### List_Node_Create
+```C
+/*
+ *  @brief 				Alloocate and instantiate a list node.
+ *  @param void* 		The data to hold within the node.
+ *  @return List_Node* 	A pointer to the allocated node or NULL on error.
+ */
+static List_Node* List_Node_Create(void* data_p);
+```
+<br/>
+<br/>
+
+### List_Node_At
+```C
+/*
+ *  @brief 				Get a pointer to the node at a given index in a given list.
+ *  @param size_t 		The index of the node in question.
+ *  @param List_t* 		A pointer to the list that contains the node in question.
+ *  @return List_Node* 	A pointer to the node at the given index or NULL on error.
+ */
+static List_Node* List_Node_At(size_t at, List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Node_Insert
+```C
+/*
+ *  @brief 					Insert a node at a given index in a given list.
+ *  @param size_t 			The index to insert the given node at.
+ *  @param List_t* 			A pointer to the list that the node should belong in.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+static List_Error_t List_Node_Insert(List_Node* node_p, size_t at, List_t* list_p);
+```
+<br/>
+<br/>
+
+### List_Node_Destroy
+```C
+/*
+ *  @brief 				Destroy a given node. 
+ *						Note that this will only destroy the node and not the data within it.
+ *  @param List_Node* 	A pointer to the node to destroy.
+ *  @return void
+ */
+static void List_Node_Destroy(List_Node* node);
+```
+<br/>
+<br/>
+
+### List_Is_Sorted
+```C
+/*
+ *  @brief 					Check a list for sortedness.
+ *							A list is considered sorted when each node's precedence is ordered 
+ *								from highest to lowest.
+ *  @param List_t* 			A pointer to the list to check for sortedness.
+ *  @param List_Cmp_Fnc 	An optional custom function pointer describing the precedence to use during sorting.
+ *							If NULL is used here, the list's default cmp_fnc will be used.
+ *  @return bool 			True if sorted, false if not sorted or an error occurs.
+ */
+static bool List_Is_Sorted(List_t* list_p, List_Cmp_Fnc cmp_fnc);
+```
+#### Notes
+Again, not having a descriptive failure case annoys me, but its not worth sacrificing readability to pass in more parameters or something
+<br/>
+<br/>
+
+### List_Node_Swap
+```C
+/*
+ *  @brief 					Swap the data of two given nodes.
+ *  @param List_Node* 		A pointer to the first node to swap.
+ *  @param List_Node* 		A pointer to the second node to swap.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+static List_Error_t List_Node_Swap(List_Node* node_a, List_Node* node_b);
+```
+<br/>
+<br/>
+
+### List_Node_Remove
+```C
+/*
+ *  @brief 					Remove a given node from a given list.
+ *     						Note that this will free the node structure but will NOT free 
+ * 								the data held within the node.
+ *  @param List_Node* 		A pointer to the node to remove.
+ *  @param List_t* 			A pointer to the list that should be removed from.
+ *  @return List_Error_t 	LIST_ERROR_SUCCESS on success or any error that may occur.
+ */
+static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p);
+```
+<br/>
+<br/>
 
 ## Notes
 - Removal will NOT free data (As far as the user is concerned), Deletion will
