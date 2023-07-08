@@ -64,10 +64,52 @@ struct List_Node
 
 ## User-defined functions
 
+### List_Cmp_Fnc
+```C
+/*
+ *  @brief 			A function used to compare two data entries within a list.
+ *  @param void* 	The first data entry to compare.
+ *  @param void* 	The second data entry to compare.
+ *  @return int  	The result of a comparison. 
+ * 					Positive numbers indicate precedence to the first member,
+ *	   					Negative will indicate precedence to the second, 
+ *						0 will indicate no precedence difference.
+ */
+typedef int (*List_Cmp_Fnc) (const void*, const void*);
+```
+#### Notes
+This function is used pretty extensively throughout the library.  
+This is the main way that the library can tell how two entries of data relate.  
+In terms of how this function is used to sort entries, this should give a numerical difference in data representing the proper order of each, or 0 if they are the same or order does not matter.  
+When this function is used to find or match with another, this function should preoperly detect ANY difference in the data, and return 0 if they are truly the same.  
+There are lots of tricks that can provide rich functionality using this function and a good understanding and ewxperimentation can help reveal some of these advanced usages.
+<br/>
+<br/>
+
+### List_Free_Fnc
+```C
+/*
+ *  @brief 			A function used to free data within a list.
+ *  @param void* 	The data to free.
+ *  @return void.
+ */
+typedef void (*List_Free_Fnc) (void*);
+```
+#### Notes
+This function is used wherever a destruction or deletion and thus a free happens on data in a list node.  
+An attempt to make this convenient to override where possible will be made and the user can decide to have this function do nothing if they wsh to manually track and free data.  
+In a normal implementation, this will simply pass the data to the c standard `free()` function.
+<br/>
+<br/>
+
+
+<br/>
 <br/>
 <br/>
 
 ## Functions
+<br/>
+
 ### List_Create
 ```C
 /*
@@ -416,6 +458,7 @@ Its better because its stable and much more efficient.
 
 ## Static functions
 Users really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
+<br/>
 
 ### List_Node_Create
 ```C
@@ -514,7 +557,13 @@ static List_Error_t List_Node_Remove(List_Node* node, List_t* list_p);
 <br/>
 <br/>
 
+<br/>
+<br/>
+<br/>
+
 ## Notes
+<br/>
+
 - Removal will NOT free data (As far as the user is concerned), Deletion will
 - NULL data is not allowed because it messes up error checking, you can, however, use a pointer to NULL data
 
