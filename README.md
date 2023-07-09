@@ -102,6 +102,64 @@ In a normal implementation, this will simply pass the data to the c standard `fr
 <br/>
 <br/>
 
+### List_Find_Fnc
+```C
+/*
+ *  @brief 			Used to perform a boolean test using data within a list.
+ *  @param void* 	The data to perform the test on.
+ *  @return bool 	True should indicate a passed test and False should indicate a failed test.
+ */
+typedef bool (*List_Find_Fnc) (const void*);
+```
+#### Notes
+This function is used wherever a value needs to be 'found'. A return from this function should clearly indicate whether an item passed in is the item in fits a criteria. Not to be confused with the CMP function, this function is not entirely meant to match data together. 
+In a normal implementation, True means that the data passed in fits the criteria while False indicates a failure.
+<br/>
+<br/>
+
+### List_Do_Fnc
+```C
+/*
+ *  @brief 			Used to perform an action using data within a list.
+ *  @param void* 	The data to perform a task on.
+ *  @return void.
+ */
+typedef void (*List_Do_Fnc) (void*);
+```
+#### Notes
+This function is used to perform (hopefully simple) tasks on data entries. Sort of a free-form function to do whatever you like with the data in an entry.
+<br/>
+<br/>
+
+### List_Reduce_Fnc
+```C
+/*
+ *  @brief 			A function used to perform reduction on a list.
+ *  @param void* 	The data to perform a single reduction.
+ *  @param int 		The value of the accumulator at it current state
+ *  @return void 	The value of the accumulator after reduction.
+ */
+typedef void* (*List_Reduce_Fnc) (const void*, void*);
+```
+#### Notes
+Used during reduce pretty exclusively to take data, add it to the accumulator, and return the sum (or whatver transformation you wish to occur to the accumulator.).
+<br/>
+<br/>
+
+### List_Copy_Fnc
+```C
+/*
+ *  @brief 			A function used to perform a copy of a value and return a pointer to the newly created data.
+ *  @param void* 	The data to perform a copy on. This should not be altered.
+ *  @return void* 	A pointer to the newly copied data.
+ */
+typedef void* (*List_Copy_Fnc) (const void*);
+```
+#### Notes
+This function is meant to be used to allocate a copy of the given data.
+<br/>
+<br/>
+
 
 <br/>
 <br/>
