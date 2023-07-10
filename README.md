@@ -1,16 +1,12 @@
 # C-List
-List library for C aimed at wide, general, thread-safe usage with enough functionality to make list usage super convenient!
+List library for C aimed at simple, general, thread-safe usage with enough functionality to make working with lists easy and convenient!
 <br/>
 <br/>
 
 # A little about the design
-Everytime I start a project, I find myself re-coding some pretty basic stuff like this because nothing fits my needs how I'd like. Well, I've had enough!
+I loosely took inspiration from the Javascript Array methods but would be happy to entertain additions or modifications.
 
-I loosely took inspiration from the Javascript Array API because I love the method selection and have never been left wanting whenever I use it. Whenever I come across a task that would benefit from an addition, I wouldn't mind adding it.
-
-I tried to keep everything small, readable, and efficient enough not to embarrass myself but I'm sure theres room for improvement. Once I take note of them, I'll be quick to update this repo.
-
-I've made a (lazy) attempt at ensuring that this library is thread safe and doesnt leak memory but extensive testing is yet to be done. My development machine as of now is a running MACOS so valgrind is a bit of a difficulty to get running. After testing is done, more of an attempt at ensuring thread efficiency and stability will be made
+I still have a pretty long list of TODOs in my notepad so expect some implementation changes under the hood. The usage should remain the same for the most part.
 <br/>
 <br/>
 
@@ -57,9 +53,16 @@ make
 <br/>
 
 # Including
+- I use git's ```submodules``` to include libraries so the following may be slightly tailored toward that.
 ## Including shared library with CMake
-
-## Including manually
+- First, in order to build the library alongside your cmake files, add the following to your ```cmakelists.txt```:
+```bash
+add_subdirectory({list library directory})
+```
+- Then link the library using the following
+```bash
+target_link_libraries(${PROJECT_NAME} list)
+```
 <br/>
 <br/>
 
