@@ -7,7 +7,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wpedantic -Wextra")
 
 include_directories(".")
 
-add_library(${PROJECT_NAME} SHARED list.c)
+add_library(${PROJECT_NAME} list.c)
 
 if (TEST)
     add_subdirectory(deps/googletest)

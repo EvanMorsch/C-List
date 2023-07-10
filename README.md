@@ -15,13 +15,50 @@ I've made a (lazy) attempt at ensuring that this library is thread safe and does
 <br/>
 
 # Building
-## Building with CMake
-## Building manually
+## Creating build files with CMake
+- Start by making and changing to a ```build``` directory.  
+This will keep all of your build artifacts in one place.
+```bash
+mkdir build
+cd build
+```
+- Build makefile with cmake.
+```bash
+cmake ..
+```
+- By default, cmake builds libraries statically, to build it as a shared library, add the following argument:
+```bash
+cmake -DBUILD_SHARED_LIBS=ON ..
+```
+<br/>
+<br/>
+
+## Building the library
+- While in the same build directory, just run make using the makefile previously created by cmake.
+```bash
+make
+```
+- The library is created as ```liblist.a```. the extension will depend on whatever system you're on and whether you made it statically or not.  
+(I'm using a mac so I get either a ```".a"``` or ```".dylib"```)
+<br/>
+<br/>
+
+## Building with tests
+- Add the following arguemnt to the cmake build file creation command:
+```bash
+cmake -DTEST=ON ..
+```
+- And make as normal:
+```bash
+make
+```
+- The program ```test``` is created, run it to test all modules.
 <br/>
 <br/>
 
 # Including
 ## Including shared library with CMake
+
 ## Including manually
 <br/>
 <br/>
@@ -524,7 +561,7 @@ Its better because its stable and much more efficient.
 <br/>
 
 ## Static functions
-Users really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them
+Users really shouldnt ever need to touch these but, theyre there to be used i guess so i'll go over them.  
 <br/>
 
 ### List_Node_Create
