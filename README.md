@@ -30,10 +30,14 @@ I've made a (lazy) attempt at ensuring that this library is thread safe and does
 For those interested (And so I remember...), I'll go fairly in-depth for portions of the following sections of the documentation. I feel like it helps to understand how best to use things when you understand them more than really required.
 
 That being said, This project is *really* meant to be my attempt at never needing to worry about a list ever again when I develop in C going forward so don't let the over-explanations bore you if you don't care.
+<br/>
+<br/>
+
 ## Structures
 Both structures are not exposed to the user through the header as they are both meant to be seen but not understood. Their use (To any meaningful extent) should require the use of the library and its functions.
 
 There are two structures used in this list implementation. One is used to help organize data and metadata within nodes, and the other is to help organize list data and metadata.
+<br/>
 
 The List_t structure defines list metadata and holds references to the nodes themselves. The structure is defined as follows:
 ```C
@@ -58,11 +62,15 @@ struct List_Node
 	List_Node* previous_p; //previous node
 };
 ```
-
 <br/>
 <br/>
 
 ## User-defined functions
+These functions are used throughout the library as a way for the library Top know how to handle the data you tell it to work with.
+For example, when comparing two ints, subtracting them together can provide an integer representing the difference between them. How would the library know how to compare structures, floats, or files.  
+All of these can be compared (and thus handled by this library) using a specially made comparison function.  
+These functions also include ways to handle freeing, finding, reducing, and more with the data held in a list.
+<br/>
 
 ### List_Cmp_Fnc
 ```C
@@ -166,6 +174,7 @@ This function is meant to be used to allocate a copy of the given data.
 <br/>
 
 ## Functions
+The following functions are the basic functions available during normal usage of the library.  
 <br/>
 
 ### List_Create
