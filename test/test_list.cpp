@@ -771,6 +771,32 @@ int test_val3 = 63;
     }
 //}
 
+//List_Iterator_Create_Reverse
+//{
+    //Tests a valid usage
+    TEST(ListIteratorCreateReverse, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        List_Push(&test_val1, test_list);
+
+        EXPECT_NE(List_Iterator_Create_Reverse(test_list), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListIteratorCreateReverse, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Iterator_Create_Reverse(test_list), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Test List for each with improper args
+    TEST(ListIteratorCreateReverse, InvalidArgs) {
+        EXPECT_EQ(List_Iterator_Create_Reverse(NULL), nullptr);
+    }
+//}
+
 //List_Iterator_Next
 //{
     //Tests a valid usage
@@ -786,6 +812,23 @@ int test_val3 = 63;
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val1);
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val2);
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val3);
+        EXPECT_EQ(List_Iterator_Next(iter_p), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListIteratorNext, ValidArgsReverse) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        List_Push(&test_val1, test_list);
+        List_Push(&test_val2, test_list);
+        List_Push(&test_val3, test_list);
+
+        List_Iterator_p iter_p = List_Iterator_Create_Reverse(test_list);
+
+        EXPECT_EQ(List_Iterator_Next(iter_p), &test_val3);
+        EXPECT_EQ(List_Iterator_Next(iter_p), &test_val2);
+        EXPECT_EQ(List_Iterator_Next(iter_p), &test_val1);
         EXPECT_EQ(List_Iterator_Next(iter_p), nullptr);
 
         List_Destroy(test_list);
