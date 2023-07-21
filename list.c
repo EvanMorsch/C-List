@@ -32,6 +32,14 @@ typedef struct List_t
 }
 List_t;
 
+typedef struct List_Iterator_t
+{
+	List_p list_p;
+	List_Node* curr_p;
+	bool reverse;
+}
+List_Iterator_t;
+
 /*
  *  @brief Create a list node structure.
  *  @param void* The data to hold within the node.
@@ -804,6 +812,22 @@ void* List_Shift(List_t* list_p) //safe
 
 	//we should be on the correct node data, return it
 	return removing_node_data;
+}
+
+List_Iterator_p List_Iterator_Create(List_p list_p)
+{
+	List_Iterator_p iter_p = NULL;
+	if (NULL != list_p && List_Length(list_p))
+	{
+		iter_p = calloc(1, sizeof(List_Iterator_t));
+		if (NULL != iter_p)
+		{
+			iter_p->list_p = list_p;
+			iter_p->curr_p = List_At(0, list_p);
+			iter_p->reverse = false; //just for clarity
+		}
+	}
+	return iter_p;
 }
 
 /*
