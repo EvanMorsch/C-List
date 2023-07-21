@@ -744,3 +744,29 @@ int test_val3 = 63;
         List_Destroy(test_list);
     }
 //}
+
+//List_Iterator_Create
+//{
+    //Tests a valid usage
+    TEST(ListIteratorCreate, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        List_Push(&test_val1, test_list);
+
+        EXPECT_NE(List_Iterator_Create(test_list), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Tests a valid usage
+    TEST(ListIteratorCreate, ValidEmpty) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        EXPECT_EQ(List_Iterator_Create(test_list), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Test List for each with improper args
+    TEST(ListIteratorCreate, InvalidArgs) {
+        EXPECT_EQ(List_Iterator_Create(NULL), nullptr);
+    }
+//}

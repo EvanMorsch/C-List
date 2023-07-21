@@ -65,7 +65,11 @@ typedef void* (*List_Copy_Fnc) (const void*);
 /*
  *  @brief The list itself.
  */
-typedef struct List_t List_t;
+typedef struct List_t List_t, *List_p;
+/*
+ *  @brief A list iterator.
+ */
+typedef struct List_Iterator_t List_Iterator_t, *List_Iterator_p;
 
 /*
  *  @brief Create an empty list.
@@ -214,6 +218,7 @@ void* List_Pop(List_t*);
  */
 void* List_Shift(List_t*);
 
+List_Iterator_p List_Iterator_Create(List_p); //iterate 0-N
 /*
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
