@@ -830,6 +830,22 @@ List_Iterator_p List_Iterator_Create(List_p list_p)
 	return iter_p;
 }
 
+List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
+{
+	List_Iterator_p iter_p = NULL;
+	if (NULL != list_p && List_Length(list_p))
+	{
+		iter_p = calloc(1, sizeof(List_Iterator_t));
+		if (NULL != iter_p)
+		{
+			iter_p->list_p = list_p;
+			iter_p->curr_p = List_Node_At(List_Length(list_p) - 1, list_p);
+			iter_p->reverse = true;
+		}
+	}
+	return iter_p;
+}
+
 void* List_Iterator_Next(List_Iterator_p iter_p)
 {
 	void* ret_data = NULL;
