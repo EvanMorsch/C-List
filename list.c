@@ -823,11 +823,22 @@ List_Iterator_p List_Iterator_Create(List_p list_p)
 		if (NULL != iter_p)
 		{
 			iter_p->list_p = list_p;
-			iter_p->curr_p = List_At(0, list_p);
+			iter_p->curr_p = List_Node_At(0, list_p);
 			iter_p->reverse = false; //just for clarity
 		}
 	}
 	return iter_p;
+}
+
+void* List_Iterator_Next(List_Iterator_p iter_p)
+{
+	void* ret_data = NULL;
+	if (NULL != iter_p && NULL != iter_p->curr_p)
+	{
+		ret_data = iter_p->curr_p->data_p;
+		iter_p->curr_p = iter_p->reverse ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
+	}
+	return ret_data;
 }
 
 /*

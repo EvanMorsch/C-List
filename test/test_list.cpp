@@ -786,7 +786,7 @@ int test_val3 = 63;
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val1);
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val2);
         EXPECT_EQ(List_Iterator_Next(iter_p), &test_val3);
-        EXPECT_EQ(List_Iterator_Next(iter_p), NULL);
+        EXPECT_EQ(List_Iterator_Next(iter_p), nullptr);
 
         List_Destroy(test_list);
     }
