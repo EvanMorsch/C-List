@@ -35,6 +35,9 @@ List_t;
 
 #define LIST_ITER_FLAG_REVERSE 0x01
 #define LIST_ITER_FLAG_FINISHED 0x02
+/*
+ *  @brief An iterator and its metadata.
+ */
 typedef struct List_Iterator_t
 {
 	List_p list_p;

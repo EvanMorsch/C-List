@@ -102,6 +102,17 @@ struct List_Node
 	List_Node* previous_p; //previous node
 };
 ```
+
+Another structure may be used to maintain an iterator for the list:
+```C
+typedef struct List_Iterator_t
+{
+	List_p list_p;
+	List_Node* curr_p;
+	uint8_t flags; //holds data about the current state of the iterator such as travel direction and status
+}
+List_Iterator_t;
+```
 <br/>
 <br/>
 
@@ -555,6 +566,84 @@ List_Error_t List_Sort(List_t* list_p, List_Cmp_Fnc cmp_fnc);
 #### Notes
 Okay the algorithm i used was really lazy and inefficient, i have a merge-sort implementation planned for later.
 Its better because its stable and much more efficient.
+<br/>
+<br/>
+
+### List_Iterator_Create
+```C
+/*
+ *  @brief 					- Create an iterator for in-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create an iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create(List_p);
+```
+#### Notes
+I quickly realized how slow O(N) really feels, so this is my work-around. Brings in-oreder traversal down to O(1)!
+<br/>
+<br/>
+
+### List_Iterator_Create_Reverse
+```C
+/*
+ *  @brief 					- Create a iterator for reversed-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create a iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create_Reverse(List_p);
+```
+<br/>
+<br/>
+
+### List_Iterator_Next
+```C
+/*
+ *  @brief 					- Proceed to the next item in the list using the given iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator who is to proceed to its next list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item its order or NULL on failure.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Next(List_Iterator_p);
+```
+<br/>
+<br/>
+
+### List_Iterator_Prev
+```C
+/*
+ *  @brief 					- Preceed to the previous item in the list using the given iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator who is to preceed to its previous list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after preceeding to the previous item in its order.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Prev(List_Iterator_p);
+```
+<br/>
+<br/>
+
+### List_Iterator_Curr
+```C
+/*
+ *  @brief 					- Get a pointer to the data currently held by the iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator whose list item is to be requested.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item in the list or NULL on error.
+ * 								- If the iteration has never been started after creation, NULL will be returned.
+ * 								- Calling after the iteration finishes will 'step back' to the last item successfully seen
+ */
+void* List_Iterator_Curr(List_Iterator_p);
+```
+<br/>
+<br/>
+
+### List_Iterator_Destroy
+```C
+/*
+ *  @brief 					- Destroy an iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator to be destroyed.
+ *  @return void.
+ */
+void List_Iterator_Destroy(List_Iterator_p);
+```
 <br/>
 <br/>
 
