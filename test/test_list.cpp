@@ -761,7 +761,7 @@ int test_val3 = 63;
     TEST(ListIteratorCreate, ValidEmpty) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Iterator_Create(test_list), nullptr);
+        EXPECT_NE(List_Iterator_Create(test_list), nullptr);
 
         List_Destroy(test_list);
     }
@@ -787,7 +787,7 @@ int test_val3 = 63;
     TEST(ListIteratorCreateReverse, ValidEmpty) {
         List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
 
-        EXPECT_EQ(List_Iterator_Create_Reverse(test_list), nullptr);
+        EXPECT_NE(List_Iterator_Create_Reverse(test_list), nullptr);
 
         List_Destroy(test_list);
     }
