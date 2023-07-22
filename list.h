@@ -221,6 +221,8 @@ void* List_Shift(List_t*);
 List_Iterator_p List_Iterator_Create(List_p); //iterate 0-N
 List_Iterator_p List_Iterator_Create_Reverse(List_p); //iterate N-0
 void* List_Iterator_Next(List_Iterator_p); //return next (either N-1 or N+1)
+void* List_Iterator_Curr(List_Iterator_p);
+
 /*
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.

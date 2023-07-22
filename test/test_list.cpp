@@ -838,3 +838,27 @@ int test_val3 = 63;
         EXPECT_EQ(List_Iterator_Next(NULL), nullptr);
     }
 //}
+
+//List_Iterator_Curr
+//{
+    //Tests a valid usage
+    TEST(ListIteratorCurr, ValidArgs) {
+        List_t* test_list = List_Create(10, test_cmp_fnc, test_free_fnc);
+
+        List_Push(&test_val1, test_list);
+
+        List_Iterator_p iter_p = List_Iterator_Create(test_list);
+
+        EXPECT_EQ(List_Iterator_Curr(iter_p), nullptr);
+        List_Iterator_Next(iter_p);
+        EXPECT_EQ(List_Iterator_Curr(iter_p), &test_val1);
+        List_Iterator_Next(iter_p);
+        EXPECT_EQ(List_Iterator_Curr(iter_p), nullptr);
+
+        List_Destroy(test_list);
+    }
+    //Test List for each with improper args
+    TEST(ListIteratorCurr, InvalidArgs) {
+        EXPECT_EQ(List_Iterator_Curr(NULL), nullptr);
+    }
+//}
