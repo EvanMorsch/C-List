@@ -881,12 +881,11 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 
 void* List_Iterator_Curr(List_Iterator_p iter_p)
 {
-	void* ret_data = NULL;
 	if (NULL != iter_p && NULL != iter_p->curr_p)
 	{
-		ret_data = iter_p->curr_p->data_p;
+		return iter_p->curr_p->data_p;
 	}
-	return ret_data;
+	return NULL;
 }
 
 /*
