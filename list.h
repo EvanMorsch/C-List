@@ -65,7 +65,11 @@ typedef void* (*List_Copy_Fnc) (const void*);
 /*
  *  @brief The list itself.
  */
-typedef struct List_t List_t;
+typedef struct List_t List_t, *List_p;
+/*
+ *  @brief A list iterator.
+ */
+typedef struct List_Iterator_t List_Iterator_t, *List_Iterator_p;
 
 /*
  *  @brief Create an empty list.
@@ -213,6 +217,47 @@ void* List_Pop(List_t*);
  *  @return void* The data held within the removed node or NULL on error.
  */
 void* List_Shift(List_t*);
+
+/*
+ *  @brief 					- Create an iterator for in-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create an iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create(List_p);
+/*
+ *  @brief 					- Create a iterator for reversed-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create a iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create_Reverse(List_p);
+/*
+ *  @brief 					- Proceed to the next item in the list using the given iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator who is to proceed to its next list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item its order or NULL on failure.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Next(List_Iterator_p);
+/*
+ *  @brief 					- Preceed to the previous item in the list using the given iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator who is to preceed to its previous list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after preceeding to the previous item in its order.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Prev(List_Iterator_p);
+/*
+ *  @brief 					- Get a pointer to the data currently held by the iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator whose list item is to be requested.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item in the list or NULL on error.
+ * 								- If the iteration has never been started after creation, NULL will be returned.
+ * 								- Calling after the iteration finishes will 'step back' to the last item successfully seen
+ */
+void* List_Iterator_Curr(List_Iterator_p);
+/*
+ *  @brief 					- Destroy an iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator to be destroyed.
+ *  @return void.
+ */
+void List_Iterator_Destroy(List_Iterator_p);
 
 /*
  *  @brief Remove the first node from the list.

@@ -32,6 +32,20 @@ typedef struct List_t
 }
 List_t;
 
+
+#define LIST_ITER_FLAG_REVERSE 0x01
+#define LIST_ITER_FLAG_FINISHED 0x02
+/*
+ *  @brief An iterator and its metadata.
+ */
+typedef struct List_Iterator_t
+{
+	List_p list_p;
+	List_Node* curr_p;
+	uint8_t flags;
+}
+List_Iterator_t;
+
 /*
  *  @brief Create a list node structure.
  *  @param void* The data to hold within the node.
@@ -804,6 +818,147 @@ void* List_Shift(List_t* list_p) //safe
 
 	//we should be on the correct node data, return it
 	return removing_node_data;
+}
+
+/*
+ *  @brief 					- Create an iterator for in-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create an iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create(List_p list_p)
+{
+	List_Iterator_p iter_p = NULL;
+	if (NULL != list_p)
+	{
+		iter_p = calloc(1, sizeof(List_Iterator_t));
+		if (NULL != iter_p)
+		{
+			iter_p->list_p = list_p;
+			iter_p->curr_p = NULL;
+			iter_p->flags = 0;
+		}
+	}
+	return iter_p;
+}
+/*
+ *  @brief 					- Create a iterator for reversed-order procession through items in the given list.
+ *  @param List_p 			- A pointer to the list to create a iterator for.
+ *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Create_Reverse(List_p list_p) //safe
+{
+	List_Iterator_p iter_p = NULL;
+	if (NULL != list_p)
+	{
+		iter_p = calloc(1, sizeof(List_Iterator_t));
+		if (NULL != iter_p)
+		{
+			iter_p->list_p = list_p;
+			iter_p->curr_p = NULL;
+			iter_p->flags = LIST_ITER_FLAG_REVERSE;
+		}
+	}
+	return iter_p;
+}
+/*
+ *  @brief 					- Proceed to the next item in the list using the given iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator who is to proceed to its next list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item its order or NULL on failure.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Next(List_Iterator_p iter_p) 
+{
+	void* ret_data = NULL;
+	if (NULL != iter_p && NULL != iter_p->list_p)
+	{
+
+		pthread_mutex_lock(&(iter_p->list_p->lock));
+
+		if (NULL != iter_p->curr_p)
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
+		}
+		//if this is the first call to next
+		else if (!(iter_p->flags & LIST_ITER_FLAG_FINISHED))
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(iter_p->list_p->length - 1, iter_p->list_p) : List_Node_At(0, iter_p->list_p);
+		}
+
+		//now that we have updated curr_p, set the return value if possible
+		if (NULL != iter_p->curr_p)
+		{
+			ret_data = iter_p->curr_p->data_p;
+		}
+
+		//if we are returning NULL this must be the end of the list
+		if (NULL == ret_data)
+		{
+			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
+		}
+		pthread_mutex_unlock(&(iter_p->list_p->lock));
+	}
+	return ret_data;
+}
+/*
+ *  @brief 					- Preceed to the previous item in the list using the given iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator who is to preceed to its previous list item.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after preceeding to the previous item in its order.
+ * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
+ */
+void* List_Iterator_Prev(List_Iterator_p iter_p)
+{
+	void* ret_data = NULL;
+	if (NULL != iter_p && NULL != iter_p->list_p) //valid check
+	{ 
+
+		pthread_mutex_lock(&(iter_p->list_p->lock));
+
+		if (NULL != iter_p->curr_p)//normal scenario
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->next_p : iter_p->curr_p->previous_p;
+		}
+		//if finished
+		else if (iter_p->flags & LIST_ITER_FLAG_FINISHED)
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(0, iter_p->list_p) : List_Node_At(iter_p->list_p->length - 1, iter_p->list_p);
+			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
+		}
+
+		//now that we have updated curr_p, set the return value if possible
+		if (NULL != iter_p->curr_p)
+		{
+			ret_data = iter_p->curr_p->data_p;
+		}
+		pthread_mutex_unlock(&(iter_p->list_p->lock));
+	}
+	return ret_data;
+}
+/*
+ *  @brief 					- Get a pointer to the data currently held by the iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator whose list item is to be requested.
+ *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item in the list or NULL on error.
+ * 								- If the iteration has never been started after creation, NULL will be returned.
+ * 								- Calling after the iteration finishes will 'step back' to the last item successfully seen
+ */
+void* List_Iterator_Curr(List_Iterator_p iter_p)
+{
+	if (NULL != iter_p && NULL != iter_p->curr_p)
+	{
+		return iter_p->curr_p->data_p;
+	}
+	return NULL;
+}
+/*
+ *  @brief 					- Destroy an iterator.
+ *  @param List_Iterator_p 	- A pointer to the iterator to be destroyed.
+ *  @return void.
+ */
+void List_Iterator_Destroy(List_Iterator_p iter_p)
+{
+	if (NULL != iter_p)//not really needed
+	{
+		free(iter_p);
+	}
 }
 
 /*
