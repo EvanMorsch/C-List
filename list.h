@@ -224,6 +224,8 @@ void* List_Iterator_Next(List_Iterator_p); //return next (either N-1 or N+1)
 void* List_Iterator_Prev(List_Iterator_p); //return next (either N-1 or N+1)
 void* List_Iterator_Curr(List_Iterator_p);
 
+void List_Iterator_Destroy(List_Iterator_p);
+
 /*
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
