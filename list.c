@@ -36,7 +36,7 @@ typedef struct List_Iterator_t
 {
 	List_p list_p;
 	List_Node* curr_p;
-	bool reverse;
+	uint8_t flags;
 }
 List_Iterator_t;
 
@@ -823,8 +823,24 @@ List_Iterator_p List_Iterator_Create(List_p list_p)
 		if (NULL != iter_p)
 		{
 			iter_p->list_p = list_p;
-			iter_p->curr_p = List_Node_At(0, list_p);
-			iter_p->reverse = false; //just for clarity
+			iter_p->curr_p = NULL;
+			iter_p->flags = 0;
+		}
+	}
+	return iter_p;
+}
+
+List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
+{
+	List_Iterator_p iter_p = NULL;
+	if (NULL != list_p && List_Length(list_p))
+	{
+		iter_p = calloc(1, sizeof(List_Iterator_t));
+		if (NULL != iter_p)
+		{
+			iter_p->list_p = list_p;
+			iter_p->curr_p = List_Node_At(List_Length(list_p) - 1, list_p);
+			iter_p->reverse = true;
 		}
 	}
 	return iter_p;
