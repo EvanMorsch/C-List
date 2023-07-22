@@ -873,7 +873,32 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 		//if we are returning NULL this must be the end of the list
 		if (NULL == ret_data)
 		{
-			iter_p->flags &= LIST_ITER_FLAG_FINISHED;
+			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
+		}
+	}
+	return ret_data;
+}
+
+void* List_Iterator_Prev(List_Iterator_p iter_p)
+{
+	void* ret_data = NULL;
+	if (NULL != iter_p) //valid check
+	{
+		if (NULL != iter_p->curr_p)//normal scenario
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->next_p : iter_p->curr_p->previous_p;
+		}
+		//if finished
+		else if (iter_p->flags & LIST_ITER_FLAG_FINISHED)
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(0, iter_p->list_p) : List_Node_At(List_Length(iter_p->list_p) - 1, iter_p->list_p);
+			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
+		}
+
+		//now that we have updated curr_p, set the return value if possible
+		if (NULL != iter_p->curr_p)
+		{
+			ret_data = iter_p->curr_p->data_p;
 		}
 	}
 	return ret_data;
