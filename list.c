@@ -32,6 +32,9 @@ typedef struct List_t
 }
 List_t;
 
+
+#define LIST_ITER_FLAG_REVERSE 0x01
+#define LIST_ITER_FLAG_FINISHED 0x02
 typedef struct List_Iterator_t
 {
 	List_p list_p;
@@ -817,7 +820,7 @@ void* List_Shift(List_t* list_p) //safe
 List_Iterator_p List_Iterator_Create(List_p list_p)
 {
 	List_Iterator_p iter_p = NULL;
-	if (NULL != list_p && List_Length(list_p))
+	if (NULL != list_p)
 	{
 		iter_p = calloc(1, sizeof(List_Iterator_t));
 		if (NULL != iter_p)
@@ -833,14 +836,14 @@ List_Iterator_p List_Iterator_Create(List_p list_p)
 List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
 {
 	List_Iterator_p iter_p = NULL;
-	if (NULL != list_p && List_Length(list_p))
+	if (NULL != list_p)
 	{
 		iter_p = calloc(1, sizeof(List_Iterator_t));
 		if (NULL != iter_p)
 		{
 			iter_p->list_p = list_p;
-			iter_p->curr_p = List_Node_At(List_Length(list_p) - 1, list_p);
-			iter_p->reverse = true;
+			iter_p->curr_p = NULL;
+			iter_p->flags = LIST_ITER_FLAG_REVERSE;
 		}
 	}
 	return iter_p;
@@ -849,10 +852,29 @@ List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
 void* List_Iterator_Next(List_Iterator_p iter_p)
 {
 	void* ret_data = NULL;
-	if (NULL != iter_p && NULL != iter_p->curr_p)
+	if (NULL != iter_p)
 	{
-		ret_data = iter_p->curr_p->data_p;
-		iter_p->curr_p = iter_p->reverse ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
+		if (NULL != iter_p->curr_p)
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
+		}
+		//if this is the first call to next
+		else if (!(iter_p->flags & LIST_ITER_FLAG_FINISHED))
+		{
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(List_Length(iter_p->list_p) - 1, iter_p->list_p) : List_Node_At(0, iter_p->list_p);
+		}
+
+		//now that we have updated curr_p, set the return value if possible
+		if (NULL != iter_p->curr_p)
+		{
+			ret_data = iter_p->curr_p->data_p;
+		}
+
+		//if we are returning NULL this must be the end of the list
+		if (NULL == ret_data)
+		{
+			iter_p->flags &= LIST_ITER_FLAG_FINISHED;
+		}
 	}
 	return ret_data;
 }
