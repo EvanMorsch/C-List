@@ -842,7 +842,7 @@ List_Iterator_p List_Iterator_Create(List_p list_p)
  *  @param List_p 			- A pointer to the list to create a iterator for.
  *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
  */
-List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
+List_Iterator_p List_Iterator_Create_Reverse(List_p list_p) //safe
 {
 	List_Iterator_p iter_p = NULL;
 	if (NULL != list_p)
@@ -863,11 +863,14 @@ List_Iterator_p List_Iterator_Create_Reverse(List_p list_p)
  *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item its order or NULL on failure.
  * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
  */
-void* List_Iterator_Next(List_Iterator_p iter_p)
+void* List_Iterator_Next(List_Iterator_p iter_p) 
 {
 	void* ret_data = NULL;
-	if (NULL != iter_p)
+	if (NULL != iter_p && NULL != iter_p->list_p)
 	{
+
+		pthread_mutex_lock(&(iter_p->list_p->lock));
+
 		if (NULL != iter_p->curr_p)
 		{
 			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
@@ -875,7 +878,7 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 		//if this is the first call to next
 		else if (!(iter_p->flags & LIST_ITER_FLAG_FINISHED))
 		{
-			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(List_Length(iter_p->list_p) - 1, iter_p->list_p) : List_Node_At(0, iter_p->list_p);
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(iter_p->list_p->length - 1, iter_p->list_p) : List_Node_At(0, iter_p->list_p);
 		}
 
 		//now that we have updated curr_p, set the return value if possible
@@ -889,6 +892,7 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 		{
 			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
 		}
+		pthread_mutex_unlock(&(iter_p->list_p->lock));
 	}
 	return ret_data;
 }
@@ -901,8 +905,11 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 void* List_Iterator_Prev(List_Iterator_p iter_p)
 {
 	void* ret_data = NULL;
-	if (NULL != iter_p) //valid check
-	{
+	if (NULL != iter_p && NULL != iter_p->list_p) //valid check
+	{ 
+
+		pthread_mutex_lock(&(iter_p->list_p->lock));
+
 		if (NULL != iter_p->curr_p)//normal scenario
 		{
 			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->next_p : iter_p->curr_p->previous_p;
@@ -910,7 +917,7 @@ void* List_Iterator_Prev(List_Iterator_p iter_p)
 		//if finished
 		else if (iter_p->flags & LIST_ITER_FLAG_FINISHED)
 		{
-			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(0, iter_p->list_p) : List_Node_At(List_Length(iter_p->list_p) - 1, iter_p->list_p);
+			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(0, iter_p->list_p) : List_Node_At(iter_p->list_p->length - 1, iter_p->list_p);
 			iter_p->flags ^= LIST_ITER_FLAG_FINISHED;
 		}
 
@@ -919,6 +926,7 @@ void* List_Iterator_Prev(List_Iterator_p iter_p)
 		{
 			ret_data = iter_p->curr_p->data_p;
 		}
+		pthread_mutex_unlock(&(iter_p->list_p->lock));
 	}
 	return ret_data;
 }
