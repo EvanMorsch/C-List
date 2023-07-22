@@ -913,6 +913,14 @@ void* List_Iterator_Curr(List_Iterator_p iter_p)
 	return NULL;
 }
 
+void List_Iterator_Destroy(List_Iterator_p iter_p)
+{
+	if (NULL != iter_p)//not really needed
+	{
+		free(iter_p);
+	}
+}
+
 /*
  *  @brief Remove the first node from the list.
  *  @param List_t* The list to reduce.
