@@ -595,6 +595,18 @@ List_Iterator_p List_Iterator_Create_Reverse(List_p);
 <br/>
 <br/>
 
+### List_Iterator_Copy
+```C
+/*
+ *  @brief 					- Copy an iterator to a newly allocated iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator to copy.
+ *  @return List_Iterator_p - A pointer to a copied list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Copy(List_Iterator_p iter_p);
+```
+<br/>
+<br/>
+
 ### List_Iterator_Next
 ```C
 /*

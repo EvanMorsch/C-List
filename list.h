@@ -6,6 +6,7 @@
 #define list_h
 
 #include <stdio.h>
+#include <string.h> //memcpy
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -225,11 +226,17 @@ void* List_Shift(List_t*);
  */
 List_Iterator_p List_Iterator_Create(List_p);
 /*
- *  @brief 					- Create a iterator for reversed-order procession through items in the given list.
+ *  @brief 					- Create an iterator for reversed-order procession through items in the given list.
  *  @param List_p 			- A pointer to the list to create a iterator for.
  *  @return List_Iterator_p - A pointer to an allocated list iterator or NULL on failure.
  */
 List_Iterator_p List_Iterator_Create_Reverse(List_p);
+/*
+ *  @brief 					- Copy an iterator to a newly allocated iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator to copy.
+ *  @return List_Iterator_p - A pointer to a copied list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Copy(List_Iterator_p);
 /*
  *  @brief 					- Proceed to the next item in the list using the given iterator.
  *  @param List_Iterator_p	- A pointer to the iterator who is to proceed to its next list item.
