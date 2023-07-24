@@ -861,6 +861,21 @@ List_Iterator_p List_Iterator_Create_Reverse(List_p list_p) //safe
 	return iter_p;
 }
 /*
+ *  @brief 					- Copy an iterator to a newly allocated iterator.
+ *  @param List_Iterator_p	- A pointer to the iterator to copy.
+ *  @return List_Iterator_p - A pointer to a copied list iterator or NULL on failure.
+ */
+List_Iterator_p List_Iterator_Copy(List_Iterator_p iter_p)
+{
+	if (NULL != iter_p)
+	{
+		List_Iterator_p new_iter_p = calloc(1, sizeof(List_Iterator_t));
+		memcpy(new_iter_p, iter_p, sizeof(List_Iterator_t));
+		return new_iter_p;
+	}
+	return NULL;
+}
+/*
  *  @brief 					- Proceed to the next item in the list using the given iterator.
  *  @param List_Iterator_p	- A pointer to the iterator who is to proceed to its next list item.
  *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item its order or NULL on failure.
