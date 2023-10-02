@@ -893,7 +893,7 @@ void* List_Iterator_Next(List_Iterator_p iter_p)
 		{
 			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? iter_p->curr_p->previous_p : iter_p->curr_p->next_p;
 		}
-		//if this is the first call to next
+		//if this is the first call to next, start the iteration
 		else if (!(iter_p->flags & LIST_ITER_FLAG_FINISHED))
 		{
 			iter_p->curr_p = (iter_p->flags & LIST_ITER_FLAG_REVERSE) ? List_Node_At(iter_p->list_p->length - 1, iter_p->list_p) : List_Node_At(0, iter_p->list_p);

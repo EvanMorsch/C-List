@@ -247,14 +247,14 @@ void* List_Iterator_Next(List_Iterator_p);
 /*
  *  @brief 					- Preceed to the previous item in the list using the given iterator.
  *  @param List_Iterator_p 	- A pointer to the iterator who is to preceed to its previous list item.
- *  @return List_Iterator_p - A pointer to the data held by the iterator after preceeding to the previous item in its order.
+ *  @return void* 			- A pointer to the data held by the iterator after preceeding to the previous item in its order.
  * 								- Although expected, the end of an iteration is considered an 'error' and thus returns NULL when hit.
  */
 void* List_Iterator_Prev(List_Iterator_p);
 /*
  *  @brief 					- Get a pointer to the data currently held by the iterator.
  *  @param List_Iterator_p 	- A pointer to the iterator whose list item is to be requested.
- *  @return List_Iterator_p - A pointer to the data held by the iterator after proceeding to the next item in the list or NULL on error.
+ *  @return void* 			- A pointer to the data held by the iterator without proceeding to the next item in the list or NULL on error.
  * 								- If the iteration has never been started after creation, NULL will be returned.
  * 								- Calling after the iteration finishes will 'step back' to the last item successfully seen
  */
